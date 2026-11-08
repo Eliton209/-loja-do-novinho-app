@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "ldn-app-";
-const CACHE_NAME = `${CACHE_PREFIX}v1`;
+const CACHE_NAME = `${CACHE_PREFIX}v2`;
 const APP_FILES = [
   "./",
   "./index.html",
