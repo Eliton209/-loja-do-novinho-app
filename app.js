@@ -10,6 +10,13 @@ function updateConnectionMessage() {
   offlineNote.hidden = navigator.onLine;
 }
 
+function markAsInstalled() {
+  installButtonLabel.textContent = "APLICATIVO INSTALADO";
+  installButton.disabled = true;
+  installButton.setAttribute("aria-label", "Aplicativo instalado");
+  installHelp.hidden = true;
+}
+
 function showInstallHelp() {
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const isSamsung = /samsungbrowser/i.test(navigator.userAgent);
@@ -23,6 +30,10 @@ function showInstallHelp() {
   }
 
   installHelp.hidden = false;
+}
+
+if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true) {
+  markAsInstalled();
 }
 
 installButton.addEventListener("click", async () => {
@@ -46,10 +57,7 @@ window.addEventListener("beforeinstallprompt", (event) => {
 
 window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
-  installButtonLabel.textContent = "APLICATIVO INSTALADO";
-  installButton.disabled = true;
-  installButton.setAttribute("aria-label", "Aplicativo instalado");
-  installHelp.hidden = true;
+  markAsInstalled();
 });
 
 window.addEventListener("online", updateConnectionMessage);
