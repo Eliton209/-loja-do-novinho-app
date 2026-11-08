@@ -1,0 +1,223 @@
+:root {
+  color-scheme: light;
+  --blue-950: #082e70;
+  --blue-900: #0b438f;
+  --blue-700: #0b58bd;
+  --blue-500: #1687e8;
+  --blue-100: #dceeff;
+  --blue-050: #f1f8ff;
+  --gold: #f2a900;
+  --ink: #102e5f;
+}
+
+* { box-sizing: border-box; }
+
+html, body { min-width: 320px; min-height: 100%; margin: 0; }
+
+body {
+  background: #eaf4ff;
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.page-shell {
+  position: relative;
+  display: flex;
+  min-height: 100svh;
+  flex-direction: column;
+  overflow: hidden;
+  padding: max(18px, env(safe-area-inset-top)) 18px max(14px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(ellipse at 50% 25%, rgba(255,255,255,.98) 0 22%, rgba(255,255,255,.65) 44%, transparent 68%),
+    linear-gradient(160deg, #fafdff 0%, #eaf5ff 64%, #d8ebff 100%);
+}
+
+.top-ribbon, .bottom-ribbon {
+  position: absolute;
+  z-index: 0;
+  left: -15%;
+  width: 130%;
+  pointer-events: none;
+  background: linear-gradient(115deg, #07367e, #0870ce 58%, #32a5ee);
+}
+
+.top-ribbon {
+  top: -90px;
+  height: 150px;
+  border-radius: 0 0 52% 48%;
+  transform: rotate(-7deg);
+  box-shadow: 0 8px 0 rgba(26, 145, 226, .28);
+}
+
+.bottom-ribbon {
+  bottom: -100px;
+  height: 130px;
+  border-radius: 52% 48% 0 0;
+  transform: rotate(3deg);
+}
+
+.welcome-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(100%, 540px);
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 48px auto 20px;
+  padding: clamp(24px, 5vh, 48px) clamp(18px, 6vw, 38px);
+  border: 1px solid rgba(255,255,255,.86);
+  border-radius: 34px;
+  background: rgba(255,255,255,.76);
+  box-shadow: 0 24px 70px rgba(10, 64, 133, .13);
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+
+.brand-mark {
+  width: clamp(124px, 31vw, 176px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 5px solid #fff;
+  border-radius: 28px;
+  background: #000;
+  box-shadow: 0 12px 28px rgba(4, 42, 104, .2), 0 0 0 2px var(--blue-100);
+}
+
+.brand-logo { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.eyebrow {
+  margin: 22px 0 7px;
+  color: var(--blue-900);
+  font-size: .82rem;
+  font-weight: 850;
+  letter-spacing: .19em;
+}
+
+h1 {
+  max-width: 420px;
+  margin: 0;
+  color: var(--blue-950);
+  font-size: clamp(1.05rem, 4.3vw, 1.48rem);
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+h1 span { color: var(--gold); }
+
+.gold-rule {
+  width: 94px;
+  height: 5px;
+  margin: 13px auto 0;
+  border-radius: 999px;
+  background: var(--gold);
+  transform: rotate(-3deg);
+}
+
+.welcome-copy {
+  max-width: 360px;
+  margin: 22px 0 24px;
+  color: #254a7d;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  line-height: 1.5;
+}
+
+.benefits {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin-bottom: clamp(24px, 5vh, 38px);
+}
+
+.benefit {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #153d78;
+  font-size: clamp(.67rem, 2.5vw, .85rem);
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.benefit-icon {
+  display: grid;
+  width: clamp(48px, 13vw, 66px);
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--blue-100);
+}
+
+.benefit-icon svg { width: 56%; fill: var(--blue-700); }
+.benefit-icon .icon-cutout { fill: none; stroke: white; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4; }
+.benefit-icon .icon-cutout-fill { fill: white; }
+
+.store-button {
+  display: grid;
+  width: 100%;
+  min-height: 72px;
+  grid-template-columns: 58px 1fr 24px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(105deg, #1673d1, #0752b2 56%, #083b8a);
+  box-shadow: 0 12px 24px rgba(6, 67, 151, .23), inset 0 1px 0 rgba(255,255,255,.28);
+  color: white;
+  text-decoration: none;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.store-button:hover { box-shadow: 0 15px 30px rgba(6, 67, 151, .3), inset 0 1px 0 rgba(255,255,255,.3); transform: translateY(-2px); }
+.store-button:focus-visible { outline: 4px solid var(--gold); outline-offset: 4px; }
+.cart-icon { display: grid; height: 44px; place-items: center; border-right: 1px solid rgba(255,255,255,.55); padding-right: 12px; }
+.cart-icon svg { width: 40px; fill: none; stroke: white; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; }
+.button-label { font-size: clamp(.91rem, 4.4vw, 1.27rem); font-weight: 850; letter-spacing: .025em; white-space: nowrap; }
+.button-arrow { font-size: 2.5rem; font-weight: 300; line-height: .8; }
+
+.destination-note, .offline-note { margin: 13px 0 0; color: #527094; font-size: .78rem; }
+.offline-note { color: #9c3b13; font-weight: 650; }
+
+.page-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: auto auto 0;
+  padding: 15px 4px 6px;
+  color: white;
+  font-size: .96rem;
+  font-style: italic;
+  font-weight: 700;
+  text-shadow: 0 1px 5px rgba(0,31,81,.55);
+}
+
+.footer-line { width: 45px; height: 1px; background: rgba(255,255,255,.88); }
+
+@media (max-height: 740px) {
+  .page-shell { padding-top: max(10px, env(safe-area-inset-top)); }
+  .welcome-card { margin-top: 36px; margin-bottom: 10px; padding-top: 18px; padding-bottom: 18px; }
+  .brand-mark { width: clamp(104px, 25vh, 148px); }
+  .eyebrow { margin-top: 15px; }
+  .welcome-copy { margin-top: 14px; margin-bottom: 16px; }
+  .benefits { margin-bottom: 19px; }
+  .store-button { min-height: 64px; }
+}
+
+@media (min-width: 700px) {
+  .page-shell { padding-right: 28px; padding-left: 28px; }
+  .welcome-card { margin-top: 60px; }
+  .top-ribbon { top: -115px; height: 190px; }
+  .bottom-ribbon { bottom: -122px; height: 166px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
