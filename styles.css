@@ -128,7 +128,7 @@ h1 span { color: var(--gold); }
   width: 100%;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 7px;
-  margin-bottom: clamp(24px, 5vh, 38px);
+  margin-bottom: 24px;
 }
 
 .benefit {
@@ -156,29 +156,61 @@ h1 span { color: var(--gold); }
 .benefit-icon .icon-cutout { fill: none; stroke: white; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4; }
 .benefit-icon .icon-cutout-fill { fill: white; }
 
-.store-button {
+.install-button, .store-button {
   display: grid;
   width: 100%;
-  min-height: 72px;
-  grid-template-columns: 58px 1fr 24px;
+  min-height: 68px;
+  grid-template-columns: 48px 1fr 24px;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 10px 18px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(105deg, #1673d1, #0752b2 56%, #083b8a);
-  box-shadow: 0 12px 24px rgba(6, 67, 151, .23), inset 0 1px 0 rgba(255,255,255,.28);
   color: white;
   text-decoration: none;
+}
+
+.install-button {
+  margin-bottom: 12px;
+  background: linear-gradient(105deg, #f2ad18, #d88900 58%, #b96a00);
+  box-shadow: 0 12px 24px rgba(177, 105, 0, .22), inset 0 1px 0 rgba(255,255,255,.3);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 850;
+}
+
+.install-button:disabled { cursor: default; opacity: .8; }
+.install-button:focus-visible, .store-button:focus-visible { outline: 4px solid var(--gold); outline-offset: 4px; }
+.install-icon { display: grid; height: 42px; place-items: center; border-right: 1px solid rgba(255,255,255,.55); padding-right: 10px; font-size: 2rem; font-weight: 500; }
+#install-button-label, .button-label { font-size: clamp(.88rem, 4vw, 1.18rem); font-weight: 850; letter-spacing: .015em; white-space: nowrap; }
+.button-arrow { font-size: 2.5rem; font-weight: 300; line-height: .8; }
+
+.install-help {
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 12px 15px;
+  border: 1px solid #c5def8;
+  border-radius: 16px;
+  background: #f1f8ff;
+  color: #214a7d;
+  font-size: .88rem;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.install-help strong { display: block; margin-bottom: 3px; color: var(--blue-950); }
+
+.store-button {
+  min-height: 68px;
+  grid-template-columns: 48px 1fr 24px;
+  background: linear-gradient(105deg, #1673d1, #0752b2 56%, #083b8a);
+  box-shadow: 0 12px 24px rgba(6, 67, 151, .23), inset 0 1px 0 rgba(255,255,255,.28);
   transition: transform .16s ease, box-shadow .16s ease;
 }
 
 .store-button:hover { box-shadow: 0 15px 30px rgba(6, 67, 151, .3), inset 0 1px 0 rgba(255,255,255,.3); transform: translateY(-2px); }
-.store-button:focus-visible { outline: 4px solid var(--gold); outline-offset: 4px; }
-.cart-icon { display: grid; height: 44px; place-items: center; border-right: 1px solid rgba(255,255,255,.55); padding-right: 12px; }
-.cart-icon svg { width: 40px; fill: none; stroke: white; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; }
-.button-label { font-size: clamp(.91rem, 4.4vw, 1.27rem); font-weight: 850; letter-spacing: .025em; white-space: nowrap; }
-.button-arrow { font-size: 2.5rem; font-weight: 300; line-height: .8; }
+.cart-icon { display: grid; height: 42px; place-items: center; border-right: 1px solid rgba(255,255,255,.55); padding-right: 10px; }
+.cart-icon svg { width: 38px; fill: none; stroke: white; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; }
 
 .destination-note, .offline-note { margin: 13px 0 0; color: #527094; font-size: .78rem; }
 .offline-note { color: #9c3b13; font-weight: 650; }
@@ -207,8 +239,8 @@ h1 span { color: var(--gold); }
   .brand-mark { width: clamp(104px, 25vh, 148px); }
   .eyebrow { margin-top: 15px; }
   .welcome-copy { margin-top: 14px; margin-bottom: 16px; }
-  .benefits { margin-bottom: 19px; }
-  .store-button { min-height: 64px; }
+  .benefits { margin-bottom: 17px; }
+  .install-button, .store-button { min-height: 60px; }
 }
 
 @media (min-width: 700px) {
