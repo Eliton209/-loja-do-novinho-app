@@ -113,11 +113,10 @@ installButton.addEventListener("click", async () => {
     installHelp.hidden = true;
 
     if (choice?.outcome === "accepted") {
-      // O navegador confirmou que o usuário aceitou instalar o PWA.
-      // O evento appinstalled e a verificação standalone continuam como
-      // confirmações adicionais; o banco deduplica pelo dispositivo.
-      markAsInstalled();
-      void confirmInstallationOnce();
+      // Aceitar o prompt não prova que a instalação terminou.
+      // O evento appinstalled ou a próxima abertura em modo standalone
+      // são as confirmações usadas para registrar a instalação real.
+      installButtonLabel.textContent = "FINALIZANDO INSTALAÇÃO";
     } else {
       installButtonLabel.textContent = "INSTALAR APLICATIVO";
     }
