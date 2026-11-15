@@ -63,7 +63,7 @@ renderMlOffers();
 let installPrompt=null;
 const installButton=document.getElementById('installApp');
 window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;installButton.classList.add('install-ready');});
-installButton.addEventListener('click',async()=>{if(!window.isSecureContext){toast('Para instalar no Samsung, o Garimpador precisa estar publicado em um endereço HTTPS.');return}if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;return}toast('No Samsung Internet ou Chrome: menu ⋮ e escolha “Adicionar à tela inicial” ou “Instalar aplicativo”.');});
+installButton.addEventListener('click',async()=>{if(!window.isSecureContext){toast('Para instalar no Samsung, o Garimpador precisa estar publicado em um endereço HTTPS.');return}if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;return}toast('A instalação como aplicativo não foi oferecida por este navegador. Abra no Google Chrome e escolha menu ⋮ > “Instalar app”. Não use “Adicionar à tela inicial”, pois pode criar apenas um atalho.');});
 window.addEventListener('appinstalled',()=>{installPrompt=null;toast('Garimpador adicionado à tela inicial.');});
 if('serviceWorker' in navigator && window.isSecureContext){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));}
 
