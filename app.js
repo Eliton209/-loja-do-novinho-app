@@ -105,11 +105,26 @@ installButton.addEventListener("click", async () => {
     return;
   }
 
-  deferredInstallPrompt.prompt();
-  await deferredInstallPrompt.userChoice;
+  const installPrompt = deferredInstallPrompt;
   deferredInstallPrompt = null;
-  installButtonLabel.textContent = "INSTALAÇÃO SOLICITADA";
-  installHelp.hidden = true;
+  try {
+    installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    installHelp.hidden = true;
+
+    if (choice?.outcome === "accepted") {
+      // O navegador confirmou que o usuário aceitou instalar o PWA.
+      // O evento appinstalled e a verificação standalone continuam como
+      // confirmações adicionais; o banco deduplica pelo dispositivo.
+      markAsInstalled();
+      void confirmInstallationOnce();
+    } else {
+      installButtonLabel.textContent = "INSTALAR APLICATIVO";
+    }
+  } catch (_) {
+    installButtonLabel.textContent = "TENTAR INSTALAR NOVAMENTE";
+    deferredInstallPrompt = null;
+  }
 });
 
 window.addEventListener("beforeinstallprompt", (event) => {
