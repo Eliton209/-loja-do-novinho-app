@@ -4,6 +4,35 @@ const installButtonLabel = document.querySelector("#install-button-label");
 const installHelp = document.querySelector("#install-help");
 const installHelpText = document.querySelector("#install-help-text");
 
+const METRICS_ENDPOINT = "https://cwnkpbwnexzulutpnnoq.supabase.co/functions/v1/store-event";
+function deviceToken() {
+  let token = localStorage.getItem("ldn_metrics_device");
+  if (!token) {
+    token = crypto.randomUUID();
+    localStorage.setItem("ldn_metrics_device", token);
+  }
+  return token;
+}
+function trackEvent(eventType) {
+  try {
+    const body = JSON.stringify({
+      event_type: eventType,
+      source: "app",
+      device_token: deviceToken(),
+      path: location.pathname
+    });
+    fetch(METRICS_ENDPOINT, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body,
+      keepalive: true
+    }).catch(() => {});
+  } catch (_) {
+    // Metrics must never interrupt app navigation or installation.
+  }
+}
+
 let deferredInstallPrompt = null;
 
 function updateConnectionMessage() {
@@ -32,8 +61,10 @@ function showInstallHelp() {
   installHelp.hidden = false;
 }
 
-if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true) {
+const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+if (isStandalone) {
   markAsInstalled();
+  trackEvent("install_confirmed");
 }
 
 installButton.addEventListener("click", async () => {
@@ -58,11 +89,16 @@ window.addEventListener("beforeinstallprompt", (event) => {
 window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
   markAsInstalled();
+  trackEvent("install_confirmed");
 });
 
 window.addEventListener("online", updateConnectionMessage);
 window.addEventListener("offline", updateConnectionMessage);
 updateConnectionMessage();
+
+document.querySelector(".store-button")?.addEventListener("click", () => {
+  trackEvent("enter_store_click");
+});
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   window.addEventListener("load", () => {
