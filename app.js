@@ -85,9 +85,9 @@ function showInstallHelp() {
   if (isIOS) {
     installHelpText.textContent = "No Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”.";
   } else if (isSamsung) {
-    installHelpText.textContent = "Abra o menu do Samsung Internet e escolha “Adicionar página a” ou “Instalar aplicativo”, se disponível.";
+    installHelpText.textContent = "O Samsung Internet não disponibilizou a instalação como aplicativo. Abra este endereço no Google Chrome e escolha “Instalar app”. Não escolha “Adicionar à tela inicial”, pois isso pode criar apenas um atalho.";
   } else {
-    installHelpText.textContent = "No Chrome, toque nos três pontinhos (⋮) e escolha “Instalar app” ou “Adicionar à tela inicial”.";
+    installHelpText.textContent = "No Chrome, toque nos três pontinhos (⋮) e escolha “Instalar app”. Não escolha “Adicionar à tela inicial”, pois isso pode criar apenas um atalho.";
   }
 
   installHelp.hidden = false;
