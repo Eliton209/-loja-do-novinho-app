@@ -5,6 +5,7 @@ const installHelp = document.querySelector("#install-help");
 const installHelpText = document.querySelector("#install-help-text");
 
 const METRICS_ENDPOINT = "https://cwnkpbwnexzulutpnnoq.supabase.co/functions/v1/store-event";
+
 function deviceToken() {
   let token = localStorage.getItem("ldn_metrics_device");
   if (!token) {
@@ -13,7 +14,8 @@ function deviceToken() {
   }
   return token;
 }
-function trackEvent(eventType) {
+
+async function trackEvent(eventType) {
   try {
     const body = JSON.stringify({
       event_type: eventType,
@@ -21,20 +23,23 @@ function trackEvent(eventType) {
       device_token: deviceToken(),
       path: location.pathname
     });
-    fetch(METRICS_ENDPOINT, {
+    const response = await fetch(METRICS_ENDPOINT, {
       method: "POST",
       mode: "cors",
       headers: { "Content-Type": "application/json" },
       body,
       keepalive: true
-    }).catch(() => {});
+    });
+    return response.ok;
   } catch (_) {
     // Metrics must never interrupt app navigation or installation.
+    return false;
   }
 }
 
 let deferredInstallPrompt = null;
-trackEvent("store_open");
+let installationConfirmationPromise = null;
+void trackEvent("store_open");
 
 function updateConnectionMessage() {
   offlineNote.hidden = navigator.onLine;
@@ -45,6 +50,32 @@ function markAsInstalled() {
   installButton.disabled = true;
   installButton.setAttribute("aria-label", "Aplicativo instalado");
   installHelp.hidden = true;
+}
+
+function confirmInstallationOnce() {
+  if (installationConfirmationPromise) return installationConfirmationPromise;
+
+  installationConfirmationPromise = (async () => {
+    const key = "ldn_install_confirmed_v1";
+    try {
+      if (localStorage.getItem(key) === "1") return;
+    } catch (_) {
+      // The server also deduplicates installation confirmations by device.
+    }
+
+    const accepted = await trackEvent("install_confirmed");
+    if (accepted) {
+      try {
+        localStorage.setItem(key, "1");
+      } catch (_) {
+        // The database-side deduplication remains the source of truth.
+      }
+    } else {
+      installationConfirmationPromise = null;
+    }
+  })();
+
+  return installationConfirmationPromise;
 }
 
 function showInstallHelp() {
@@ -65,7 +96,7 @@ function showInstallHelp() {
 const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 if (isStandalone) {
   markAsInstalled();
-  trackEvent("install_confirmed");
+  void confirmInstallationOnce();
 }
 
 installButton.addEventListener("click", async () => {
@@ -90,7 +121,7 @@ window.addEventListener("beforeinstallprompt", (event) => {
 window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
   markAsInstalled();
-  trackEvent("install_confirmed");
+  void confirmInstallationOnce();
 });
 
 window.addEventListener("online", updateConnectionMessage);
@@ -98,7 +129,7 @@ window.addEventListener("offline", updateConnectionMessage);
 updateConnectionMessage();
 
 document.querySelector(".store-button")?.addEventListener("click", () => {
-  trackEvent("enter_store_click");
+  void trackEvent("enter_store_click");
 });
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
