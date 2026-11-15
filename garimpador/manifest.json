@@ -4,7 +4,7 @@
   "short_name": "Garimpador LDN",
   "description": "Ofertas da Loja do Novinho e preparação assistida para WhatsApp.",
   "lang": "pt-BR",
-  "start_url": "https://eliton209.github.io/-loja-do-novinho-app/garimpador/index.html?app=garimpador-ldn",
+  "start_url": "https://eliton209.github.io/-loja-do-novinho-app/garimpador/index.html",
   "scope": "https://eliton209.github.io/-loja-do-novinho-app/garimpador/",
   "display": "standalone",
   "orientation": "portrait-primary",
