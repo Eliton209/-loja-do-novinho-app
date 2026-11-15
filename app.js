@@ -34,6 +34,7 @@ function trackEvent(eventType) {
 }
 
 let deferredInstallPrompt = null;
+trackEvent("store_open");
 
 function updateConnectionMessage() {
   offlineNote.hidden = navigator.onLine;
