@@ -147,9 +147,25 @@ document.querySelector(".store-button")?.addEventListener("click", () => {
 });
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {
-      // A PWA continua funcionando online se o navegador bloquear o service worker.
-    });
+  let refreshingForUpdate = false;
+
+  // Quando uma nova versão assume o controle, recarrega uma única vez
+  // para que a tela passe a usar os arquivos recém-publicados.
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshingForUpdate) return;
+    refreshingForUpdate = true;
+    window.location.reload();
+  });
+
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register("./sw.js", {
+        updateViaCache: "none"
+      });
+      // Verifica atualizações ao abrir o app, sem exigir reinstalação.
+      await registration.update();
+    } catch (_) {
+      // O app continua funcionando online se o navegador bloquear o service worker.
+    }
   });
 }
