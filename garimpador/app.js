@@ -73,7 +73,7 @@ function offerCard(p){
  (affiliate?'<a class="action" href="'+escapeHtml(affiliate)+'" target="_blank" rel="noopener noreferrer">Link afiliado</a>':'<span class="review-pending">Link afiliado pendente</span>')+
  '<button class="action whatsapp" data-ml-action="send" '+(!affiliate?'disabled title="Adicione seu link de afiliado para divulgar"':'')+'>Preparar WhatsApp</button><button class="action" data-ml-action="remove">Remover</button></div></div></article>';
 }
-function renderMlOffers(){const items=readMlOffers();document.getElementById('mlQueueCount').textContent=items.length+' '+(items.length===1?'produto salvo':'produtos salvos')+' neste aparelho';mlQueue.innerHTML=items.length?items.map(offerCard).join(''):'<p class="ml-empty">Nenhum produto salvo. Pesquise nas lojas e adicione os dados do anúncio para revisar aqui.</p>';}
+function renderMlOffers(){const items=readMlOffers();document.getElementById('mlQueueCount').textContent=items.length+' '+(items.length===1?'produto salvo':'produtos salvos')+' neste aparelho';mlQueue.classList.add('review-offer-queue');mlQueue.innerHTML=items.length?items.map(offerCard).join(''):'<p class="ml-empty">Nenhum produto salvo. Pesquise nas lojas e adicione os dados do anúncio para revisar aqui.</p>';}
 function updateOfferPreview(){
  const name=document.getElementById('offerName').value.trim(),image=safeUrl(document.getElementById('offerImage').value),price=document.getElementById('offerPrice').value.trim(),market=document.getElementById('offerMarket').value,desc=document.getElementById('offerDescription').value.trim(),model=document.getElementById('offerModel').value.trim();
  document.getElementById('offerCheckedAt').value=new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short'}).format(new Date());
@@ -91,7 +91,6 @@ document.getElementById('mlOfferForm').addEventListener('submit',e=>{
  e.currentTarget.reset();document.getElementById('offerCheckedAt').value='';updateOfferPreview();renderMlOffers();toast('Produto salvo para revisão.');
 });
 document.getElementById('searchMl').addEventListener('click',()=>{const q=document.getElementById('mlQuery').value.trim()||mlCategory.value;const slug=q.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');window.open(`https://lista.mercadolivre.com.br/${encodeURIComponent(slug)}`,'_blank','noopener,noreferrer');});
-document.getElementById('mlOfferForm').addEventListener('submit',e=>{e.preventDefault();const name=document.getElementById('mlName').value.trim(),affiliate=safeUrl(document.getElementById('mlAffiliate').value.trim());if(!name||!affiliate){toast('Informe um nome e um link https de afiliado válido.');return}const existing=readMlOffers();if(existing.some(p=>p.affiliate_url===affiliate)){toast('Esse link já está na fila deste aparelho.');return}const item={id:`ml-${Date.now()}`,marketplace:'Mercado Livre',name,category:mlCategory.value,price:document.getElementById('mlPrice').value.trim(),description:document.getElementById('mlDescription').value.trim(),image_url:safeUrl(document.getElementById('mlImage').value.trim()),affiliate_url:affiliate,added_at:new Date().toISOString()};if(!saveMlOffers([item,...existing])){toast('O navegador não conseguiu salvar esta oferta.');return}e.currentTarget.reset();renderMlOffers();toast('Oferta salva neste aparelho.');});
 mlQueue.addEventListener('click',e=>{
  const card=e.target.closest('[data-ml-id]');if(!card)return;
  const items=readMlOffers(),item=items.find(p=>p.id===card.dataset.mlId);if(!item)return;
@@ -136,4 +135,78 @@ renderMlOffers();
   const winner=ml.price===mg.price?'Os dois anúncios têm o mesmo preço.':ml.price<mg.price?'Menor preço anunciado: Mercado Livre.':'Menor preço anunciado: Magalu.';
   out.innerHTML='<strong>'+winner+'</strong><p>Mercado Livre: '+money(ml.price)+' · Magalu: '+money(mg.price)+'</p><p>Diferença: '+money(Math.abs(ml.price-mg.price))+'</p>'+links+'<small>Registrado em '+stamp+'. Dados informados manualmente; confira frete, estoque e condições.</small>';
  });
+})();
+
+/* Área administrativa autenticada: pesquisa gratuita e revisão individual das ofertas. */
+(function initGarimpadorAdmin(){
+ const loginArea=document.getElementById('autoLoginArea'),workArea=document.getElementById('autoWorkArea');
+ if(!loginArea||!window.supabase?.createClient)return;
+ const SUPABASE_URL='https://cwnkpbwnexzulutpnnoq.supabase.co';
+ const SUPABASE_ANON='sb_publishable_pTrQXc1CSpuNwiQbbpYcXA_7HS94_h5';
+ const EDGE_URL=SUPABASE_URL+'/functions/v1/garimpador-auto-search';
+ const ADMIN_EMAIL='pereiraeliton811@gmail.com';
+ const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ const status=document.getElementById('autoAuthStatus'),message=document.getElementById('autoSearchStatus'),results=document.getElementById('autoOfferResults');
+ let session=null,working=false;
+ const setStatus=(text,ok=false)=>{status.textContent=text;status.classList.toggle('is-ready',ok)};
+ const api=async(action,extra={})=>{
+  if(!session?.access_token)throw new Error('Entre no painel novamente.');
+  const response=await fetch(EDGE_URL,{method:'POST',headers:{'content-type':'application/json','apikey':SUPABASE_ANON,'authorization':'Bearer '+session.access_token},body:JSON.stringify({action,...extra})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok||data.ok===false)throw new Error(data.error||'Não foi possível concluir a solicitação.');
+  return data;
+ };
+ const money=v=>typeof v==='number'&&Number.isFinite(v)?v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'Preço não informado';
+ const card=p=>{
+  const img=safeUrl(p.image_url),link=safeUrl(p.product_url),affiliate=safeUrl(p.affiliate_url);
+  return '<article class="auto-offer-card" data-auto-id="'+escapeHtml(p.id)+'">'+
+   '<div class="auto-offer-image">'+(img?'<img src="'+escapeHtml(img)+'" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<span>Foto indisponível</span>\'">':'<span>Foto não fornecida pela loja</span>')+'</div>'+
+   '<div class="auto-offer-info"><div class="auto-offer-labels"><span>Mercado Livre</span><span>'+escapeHtml(p.niche||'Sem nicho')+'</span><span class="pending-label">Aguardando sua revisão</span></div>'+
+   '<h3>'+escapeHtml(p.title||'Produto sem título')+'</h3><strong class="auto-price">'+money(p.price)+'</strong>'+
+   '<p>'+escapeHtml(p.description||'Descrição não fornecida pelo anúncio.')+'</p>'+
+   '<small>Primeira captura: '+escapeHtml(fmtDate(p.first_seen_at))+' · Verificado: '+escapeHtml(fmtDate(p.last_checked_at))+'</small>'+
+   '<div class="auto-offer-links">'+(link?'<a class="action" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">Ver anúncio original</a>':'')+
+   (affiliate?'<a class="action" href="'+escapeHtml(affiliate)+'" target="_blank" rel="noopener noreferrer">Ver link afiliado</a>':'')+'</div>'+
+   '<label class="affiliate-entry">Seu link oficial de afiliado (opcional por enquanto)<input type="url" data-auto-affiliate placeholder="Cole aqui o link gerado no portal oficial" value="'+escapeHtml(affiliate)+'"></label>'+
+   '<div class="actions"><button class="action" data-auto-action="save-link" type="button">Salvar link afiliado</button><button class="action whatsapp" data-auto-action="approve" type="button">Aprovar oferta</button><button class="action" data-auto-action="ignore" type="button">Ignorar</button></div></div></article>';
+ };
+ const load=async()=>{
+  try{const data=await api('list');const items=Array.isArray(data.items)?data.items:[];results.innerHTML=items.length?items.map(card).join(''):'<p class="ml-empty">Ainda não há ofertas pendentes. Toque em “Buscar até 20 ofertas agora”.</p>';message.textContent=items.length+' ofertas aguardando revisão.';}
+  catch(e){message.textContent=e.message;toast(e.message);}
+ };
+ const refreshAuth=async(s)=>{
+  session=s;
+  if(s?.user?.email?.toLowerCase()===ADMIN_EMAIL){
+   loginArea.hidden=true;workArea.hidden=false;setStatus('Acesso autorizado',true);await load();
+  }else{
+   session=null;loginArea.hidden=false;workArea.hidden=true;setStatus('Aguardando acesso');
+  }
+ };
+ document.getElementById('autoLoginButton').addEventListener('click',async()=>{
+  const button=document.getElementById('autoLoginButton');button.disabled=true;
+  try{const {error}=await client.auth.signInWithOtp({email:ADMIN_EMAIL,options:{emailRedirectTo:window.location.href.split('#')[0]}});if(error)throw error;message.textContent='Link de acesso enviado para o e-mail cadastrado. Abra a mensagem no mesmo aparelho e toque no link.';toast('Confira o e-mail cadastrado.');}
+  catch(e){message.textContent=e.message||'Não foi possível enviar o link de acesso.';toast(message.textContent);}
+  finally{button.disabled=false;}
+ });
+ document.getElementById('runAutoSearch').addEventListener('click',async()=>{
+  if(working)return;working=true;const button=document.getElementById('runAutoSearch');button.disabled=true;message.textContent='Pesquisando produtos públicos em vários nichos. Isso pode levar alguns minutos…';
+  try{const data=await api('search');message.textContent='Pesquisa concluída: '+data.products_found+' ofertas encontradas e '+data.products_saved+' salvas para revisão. Termos pesquisados: '+data.terms_searched+'/'+data.terms_total+'.';if(data.errors?.length)message.textContent+=' Algumas pesquisas não responderam; confira os avisos.';await load();}
+  catch(e){message.textContent='A pesquisa não foi concluída: '+e.message;toast(e.message);}
+  finally{working=false;button.disabled=false;}
+ });
+ document.getElementById('refreshAutoOffers').addEventListener('click',load);
+ document.getElementById('autoLogout').addEventListener('click',async()=>{await client.auth.signOut();await refreshAuth(null);});
+ results.addEventListener('click',async e=>{
+  const button=e.target.closest('[data-auto-action]');if(!button)return;
+  const article=button.closest('[data-auto-id]');if(!article)return;
+  const id=article.dataset.autoId,action=button.dataset.autoAction;
+  button.disabled=true;
+  try{
+   if(action==='save-link'){const field=article.querySelector('[data-auto-affiliate]');const value=field.value.trim();if(!value){throw new Error('Cole primeiro o link oficial de afiliado.')}await api('save_affiliate_link',{id,affiliate_url:value});toast('Link afiliado salvo.');await load();}
+   if(action==='approve'){await api('approve',{id});toast('Oferta aprovada.');await load();}
+   if(action==='ignore'){await api('ignore',{id});toast('Oferta ignorada.');await load();}
+  }catch(err){toast(err.message||'Não foi possível atualizar a oferta.');button.disabled=false;}
+ });
+ client.auth.onAuthStateChange((_event,s)=>{setTimeout(()=>refreshAuth(s),0);});
+ client.auth.getSession().then(({data})=>refreshAuth(data.session));
 })();
