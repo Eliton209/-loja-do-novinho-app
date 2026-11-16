@@ -1,24 +1,31 @@
 # Garimpador LDN — Plano B assistido
 
-Esta página é uma etapa isolada do Garimpador, desenvolvida em branch própria.
+Implementação isolada na branch `garimpador-plano-b-assistido`.
 
-## Fluxo
-1. Escolher nicho e termo de busca.
-2. Abrir a busca pública do Mercado Livre ordenada por preço crescente.
-3. Conferir manualmente equivalência do produto, frete, variações, condição e vendedor.
-4. Registrar nome, preço, imagem e URL do anúncio original.
-5. Abrir o anúncio pelo cartão, gerar o link no Portal de Afiliados e voltar.
-6. Colar e salvar o link oficial no próprio cartão.
+## O que esta etapa faz
+1. Pesquisa ofertas no endpoint público de busca do Mercado Livre Brasil (`/sites/MLB/search`) com `sort=price_asc`, quando o navegador permite a chamada.
+2. Mostra até 20 resultados retornados para a busca atual, com título, imagem, preço e link do anúncio.
+3. Permite adicionar até 20 produtos à seleção local.
+4. Também permite cadastrar manualmente um produto e seu endereço original.
+5. Em cada cartão, o usuário abre o anúncio, gera o link no Portal de Afiliados e cola o link oficial no próprio Garimpador.
+6. A oferta só pode ser aprovada depois de salvar um link HTTPS.
+7. Somente ofertas aprovadas podem abrir a preparação de mensagem do WhatsApp. O envio continua sendo manual.
 
-## Limites deliberados
-- Não automatiza login, cliques ou navegação no Portal de Afiliados.
-- Não gera nem presume links comissionados.
-- A etiqueta de menor preço só compara anúncios cujo nome normalizado é idêntico e que estejam cadastrados nesta rodada; não prova o menor preço de todo o mercado.
-- Até 20 ofertas por rodada; dados salvos no armazenamento local do aparelho/navegador.
-- Sem publicação no WhatsApp: a aprovação/publicação individual será etapa posterior.
-- Não altera vitrine, aplicativo cliente, integrações, branch main ou deploy.
+## Precisão de preço
+- A busca pública é solicitada em ordem crescente de preço. Isso mostra os menores preços retornados para o termo, não prova o menor preço de todo o Mercado Livre.
+- O usuário deve comparar produtos equivalentes, frete, variações, estado, vendedor e condições.
+- O sistema não compara automaticamente modelos diferentes como se fossem equivalentes.
+
+## Limites
+- Não acessa a conta do usuário nem automatiza o Portal de Afiliados.
+- Não gera, valida a comissão ou presume que um link é afiliado; apenas exige um endereço HTTPS inserido pelo usuário.
+- Dados ficam no armazenamento local do navegador/aparelho; não sincronizam entre dispositivos.
+- Se a chamada pública da API falhar por rede/CORS, abre a página pública de busca ordenada por preço para continuar manualmente.
+- Sem publicação automática e sem deploy.
+- Não altera vitrine Wix, aplicativo cliente, integrações existentes ou branch main.
 
 ## Arquivos
 - `plano-b.html`
 - `plano-b.css`
 - `plano-b.js`
+- `PLANO-B-README.md`
