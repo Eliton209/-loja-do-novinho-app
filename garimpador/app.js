@@ -1,3 +1,9 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.119.0';
+const ML_AUTH_URL='https://cwnkpbwnexzulutpnnoq.supabase.co';
+const ML_AUTH_KEY='sb_publishable_pTrQXc1CSpuNwiQbbpYcXA_7HS94_h5';
+const ML_FUNCTION_URL='https://xjvdhaqfzizioppoaaoq.supabase.co/functions/v1/garimpador-auto-search';
+const ML_ADMIN_EMAIL='pereiraeliton811@gmail.com';
+const mlAuth=createClient(ML_AUTH_URL,ML_AUTH_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const data=window.GARIMPADOR_PRODUCT_DATA;
 const tbody=document.getElementById('productRows');
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -8,8 +14,7 @@ const priceDisplay=p=>p.price_text||'Sem preço capturado';
 const ML_NICHES=['Eletrônicos','Celulares e acessórios','Informática','Casa e decoração','Cozinha','Móveis','Cama, mesa e banho','Moda e acessórios','Beleza e cuidados pessoais','Ferramentas','Eletrodomésticos','Ofertas e promoções'];
 const PARTNER_STORES=[
  {id:'shopee',name:'Shopee',label:'Loja do Novinho na Shopee',url:'https://collshp.com/elitonpereira892700?view=storefront'},
- {id:'magalu',name:'Magalu',label:'Loja do Novinho no Magalu',url:'https://influenciadormagalu.com.br/lojadonovinho'},
- {id:'mercadolivre',name:'Mercado Livre',label:'Achadinhos da Loja do Novinho no Mercado Livre',url:'https://mercadolivre.com/sec/1BcC48a'},
+  {id:'mercadolivre',name:'Mercado Livre',label:'Achadinhos da Loja do Novinho no Mercado Livre',url:'https://mercadolivre.com/sec/1BcC48a'},
  {id:'amazon',name:'Amazon',label:'Vitrine da Loja do Novinho na Amazon',url:'https://a.co/d/02OBfGU8'}
 ];
 let products=Array.isArray(data?.products)?data.products.map(p=>({...p,category_display:normalizeCategory(p.category)})):[];
@@ -46,19 +51,136 @@ document.getElementById('closeDetails').addEventListener('click',()=>document.ge
 document.getElementById('details').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.close()});
 init();
 
-const mlCategory=document.getElementById('mlCategory'),mlQueue=document.getElementById('mlOfferQueue'),mlStorageKey='garimpador-ldn-ml-offers-v2';
-function storePromo(store){return `🛍️ LOJA DO NOVINHO NA ${String(store.name).toLocaleUpperCase('pt-BR')}\\n\\nConfira nossa loja e veja os produtos disponíveis:\\n${store.url}\\n\\nPreços e disponibilidade são definidos pela plataforma e podem mudar.`;}
-function renderPartnerStores(){document.getElementById('partnerStores').innerHTML=PARTNER_STORES.map(store=>`<article class="partner-store"><div class="partner-store-mark" aria-hidden="true">${escapeHtml(store.name.slice(0,1))}</div><div class="partner-store-info"><b>${escapeHtml(store.label)}</b><span>Link direto para a loja na ${escapeHtml(store.name)}</span><div class="actions"><a class="action" href="${escapeHtml(store.url)}" target="_blank" rel="noopener noreferrer">Ver loja</a><button class="action whatsapp" data-store-action="prepare" data-store-id="${store.id}">Preparar WhatsApp</button><button class="action" data-store-action="copy" data-store-id="${store.id}">Copiar anúncio</button></div></div></article>`).join('');}
-document.getElementById('partnerStores').addEventListener('click',async e=>{const button=e.target.closest('[data-store-action]');if(!button)return;const store=PARTNER_STORES.find(item=>item.id===button.dataset.storeId);if(!store)return;const message=storePromo(store);if(button.dataset.storeAction==='prepare'){window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');return}try{await navigator.clipboard.writeText(message);toast('Anúncio da loja copiado com o link direto.')}catch{const box=document.createElement('textarea');box.value=message;box.style.position='fixed';box.style.opacity='0';document.body.append(box);box.select();const copied=document.execCommand('copy');box.remove();toast(copied?'Anúncio da loja copiado com o link direto.':'Não foi possível copiar o anúncio.');}});
-renderPartnerStores();
-ML_NICHES.forEach(n=>mlCategory.add(new Option(n,n)));
-function readMlOffers(){try{return JSON.parse(localStorage.getItem(mlStorageKey)||'[]')}catch{return[]}}
-function saveMlOffers(items){try{localStorage.setItem(mlStorageKey,JSON.stringify(items));return true}catch{return false}}
-function renderMlOffers(){const items=readMlOffers();document.getElementById('mlQueueCount').textContent=`${items.length} ${items.length===1?'produto salvo':'produtos salvos'} neste aparelho`;mlQueue.innerHTML=items.length?items.map(p=>`<article class="ml-offer-card" data-ml-id="${escapeHtml(p.id)}">${safeUrl(p.image_url)?`<img src="${escapeHtml(safeUrl(p.image_url))}" alt="" loading="lazy">`:''}<div class="ml-offer-info"><b>${escapeHtml(p.name)}</b><span>${escapeHtml(p.platform)} · ${escapeHtml(p.category)} · ${escapeHtml(p.price||'Preço não informado')}</span><span>${p.affiliate_url?'Link de afiliado informado':'Aguardando seu link de afiliado'}</span><div class="actions"><a class="action" href="${escapeHtml(p.product_url)}" target="_blank" rel="noopener noreferrer">Abrir produto</a><button class="action" data-ml-action="affiliate">Adicionar/editar meu link</button><button class="action whatsapp" data-ml-action="send" ${p.affiliate_url?'':'disabled'}>Preparar WhatsApp</button><button class="action" data-ml-action="remove">Remover</button></div></div></article>`).join(''):'<p class="ml-empty">Nenhum produto selecionado. Pesquise nas lojas e salve aqui os anúncios que quiser comparar.</p>';}
-function searchStore(kind){const q=document.getElementById('mlQuery').value.trim()||mlCategory.value;const slug=q.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLocaleLowerCase('pt-BR').trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');const url=kind==='magalu'?`https://www.magazineluiza.com.br/busca/${encodeURIComponent(slug)}/`:`https://lista.mercadolivre.com.br/${encodeURIComponent(slug)}`;window.open(url,'_blank','noopener,noreferrer');}
-document.getElementById('searchMl').addEventListener('click',()=>searchStore('ml'));
-document.getElementById('searchMagalu').addEventListener('click',()=>searchStore('magalu'));
-document.getElementById('mlOfferForm').addEventListener('submit',e=>{e.preventDefault();const name=document.getElementById('mlName').value.trim(),productUrl=safeUrl(document.getElementById('mlProductUrl').value.trim());if(!name||!productUrl){toast('Informe o nome e o link original do produto.');return}const affiliateRaw=document.getElementById('mlAffiliate').value.trim(),affiliate=affiliateRaw?safeUrl(affiliateRaw):'';if(affiliateRaw&&!affiliate){toast('O link de afiliado precisa ser HTTPS.');return}const existing=readMlOffers();if(existing.some(p=>p.product_url===productUrl)){toast('Esse produto já está na fila deste aparelho.');return}const item={id:`offer-${Date.now()}`,platform:document.getElementById('mlPlatform').value,name,category:mlCategory.value,price:document.getElementById('mlPrice').value.trim(),description:document.getElementById('mlDescription').value.trim(),image_url:safeUrl(document.getElementById('mlImage').value.trim()),product_url:productUrl,affiliate_url:affiliate,added_at:new Date().toISOString()};if(!saveMlOffers([item,...existing])){toast('O navegador não conseguiu salvar este produto.');return}e.currentTarget.reset();renderMlOffers();toast('Produto salvo. Você pode colar o link de afiliado depois.');});
-mlQueue.addEventListener('click',e=>{const card=e.target.closest('[data-ml-id]');if(!card)return;const items=readMlOffers(),item=items.find(p=>p.id===card.dataset.mlId);if(!item)return;if(e.target.dataset.mlAction==='remove'){saveMlOffers(items.filter(p=>p.id!==item.id));renderMlOffers();return}if(e.target.dataset.mlAction==='affiliate'){const value=prompt('Cole aqui o link de afiliado que você gerou na plataforma:',item.affiliate_url||'');if(value===null)return;const link=safeUrl(value.trim());if(!link){toast('Informe um link HTTPS válido.');return}item.affiliate_url=link;saveMlOffers(items);renderMlOffers();toast('Seu link de afiliado foi salvo.');return}if(e.target.dataset.mlAction==='send'){if(!item.affiliate_url){toast('Cole primeiro seu link de afiliado.');return}const price=item.price?`\\n💰 ${item.price}`:'';const desc=item.description?`\\n\\n${item.description}`:'';const message=`🔥 OFERTA ${String(item.platform).toLocaleUpperCase('pt-BR')}\\n\\n${item.name}${price}${desc}\\n\\nConfira a oferta pelo link:\\n${item.affiliate_url}\\n\\nPreço e disponibilidade podem mudar.`;window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');}});
-renderMlOffers();
-
+const mlCategory=document.getElementById('mlCategory');
+const mlResults=document.getElementById('mlResults');
+const mlStatus=document.getElementById('mlSearchStatus');
+const mlLoginForm=document.getElementById('mlLoginForm');
+const mlLoginButton=document.getElementById('mlLoginButton');
+const mlLogoutButton=document.getElementById('mlLogoutButton');
+const mlSearchButton=document.getElementById('searchMl');
+const mlReloadButton=document.getElementById('reloadMl');
+let mlSession=null;
+let mlItems=[];
+const moneyBRL=value=>typeof value==='number'&&Number.isFinite(value)?new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(value):'Preço não informado';
+function setMlStatus(message,isError=false){mlStatus.textContent=message;mlStatus.classList.toggle('error',isError);}
+function setMlAuth(session){
+ mlSession=session;
+ const logged=Boolean(session);
+ mlLoginForm.hidden=logged;
+ mlLogoutButton.hidden=!logged;
+ mlSearchButton.disabled=!logged;
+ mlReloadButton.disabled=!logged;
+ document.getElementById('mlLoginPassword').value='';
+ if(logged){document.getElementById('mlAuthStatus').textContent='Acesso administrativo conectado. Busca e aprovação habilitadas.';}
+ else{document.getElementById('mlAuthStatus').textContent='Entre com seu acesso administrativo para pesquisar e gerenciar as oportunidades.';}
+}
+async function mlRequest(action,extra={}){
+ if(!mlSession?.access_token)throw new Error('Sua sessão expirou. Entre novamente no painel.');
+ const response=await fetch(ML_FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':ML_AUTH_KEY,'Authorization':`Bearer ${mlSession.access_token}`},body:JSON.stringify({action,...extra})});
+ const payload=await response.json().catch(()=>({}));
+ if(!response.ok||payload.ok===false)throw new Error(payload.error||payload.detail||`Falha na solicitação (${response.status}).`);
+ return payload;
+}
+function mlPriceSort(a,b){
+ const pa=typeof a.price==='number'&&a.price>0?a.price:Number.POSITIVE_INFINITY;
+ const pb=typeof b.price==='number'&&b.price>0?b.price:Number.POSITIVE_INFINITY;
+ return pa-pb||String(a.title||'').localeCompare(String(b.title||''),'pt-BR');
+}
+function renderMlResults(){
+ const q=document.getElementById('mlQuery').value.trim().toLocaleLowerCase('pt-BR');
+ const niche=mlCategory.value;
+ const items=mlItems.filter(p=>(!niche||p.niche===niche)&&(!q||`${p.title||''} ${p.description||''} ${p.niche||''}`.toLocaleLowerCase('pt-BR').includes(q))).sort(mlPriceSort);
+ if(!items.length){mlResults.innerHTML='<p class="ml-empty">Nenhum produto encontrado com esses filtros. Faça uma nova busca ou altere o filtro.</p>';return;}
+ mlResults.innerHTML=items.map(p=>{
+  const image=safeUrl(p.image_url),productUrl=safeUrl(p.product_url),affiliate=safeUrl(p.affiliate_url);
+  const status=p.status==='approved'?'Aprovado para divulgação':'Aguardando aprovação';
+  return `<article class="ml-result-card" data-ml-id="${escapeHtml(p.id)}">
+   ${image?`<img class="ml-result-image" src="${escapeHtml(image)}" alt="" loading="lazy">`:'<div class="ml-result-image ml-no-image">Sem imagem</div>'}
+   <div class="ml-result-content">
+    <div class="ml-result-top"><span class="ml-result-niche">${escapeHtml(p.niche||'Outros')}</span><span class="ml-result-state ${p.status==='approved'?'approved':''}">${status}</span></div>
+    <b class="ml-result-title">${escapeHtml(p.title||'Produto sem título')}</b>
+    <strong class="ml-result-price">${moneyBRL(p.price)}</strong>
+    <p class="ml-result-description">${escapeHtml(p.description||'Sem descrição adicional fornecida pelo anúncio.')}</p>
+    <div class="ml-result-actions">${productUrl?`<a class="action" href="${escapeHtml(productUrl)}" target="_blank" rel="noopener noreferrer">Conferir anúncio</a>`:''}</div>
+    <label class="ml-affiliate-label">Seu link oficial de afiliado
+     <input class="ml-affiliate-input" data-affiliate-input="${escapeHtml(p.id)}" type="url" value="${escapeHtml(affiliate)}" placeholder="Cole aqui o link gerado na Central de Afiliados">
+    </label>
+    <div class="actions ml-manage-actions">
+     <button class="action" type="button" data-ml-action="save-link">${affiliate?'Atualizar link':'Salvar link de afiliado'}</button>
+     <button class="action whatsapp" type="button" data-ml-action="approve" ${affiliate?'':'disabled'}>Aprovar para divulgação</button>
+     <button class="action" type="button" data-ml-action="ignore">Ignorar</button>
+    </div>
+   </div>
+  </article>`;
+ }).join('');
+}
+async function loadMlItems(){
+ setMlStatus('Carregando produtos salvos…');
+ try{
+  const result=await mlRequest('list');
+  mlItems=Array.isArray(result.items)?result.items:[];
+  renderMlResults();
+  setMlStatus(`${mlItems.length} produtos carregados. Lista ordenada do menor para o maior preço.`);
+ }catch(error){setMlStatus(error.message,true);}
+}
+async function runMlSearch(){
+ if(!mlSession)return;
+ mlSearchButton.disabled=true;mlReloadButton.disabled=true;
+ setMlStatus('Pesquisando oportunidades no Mercado Livre. Isso pode levar alguns instantes…');
+ try{
+  const result=await mlRequest('search');
+  await loadMlItems();
+  const found=Number(result.products_found||0),saved=Number(result.products_saved||0);
+  setMlStatus(`Busca concluída: ${found} produtos identificados e ${saved} registros salvos. Confira preços e anúncios antes de aprovar.`,found===0);
+ }catch(error){setMlStatus(error.message,true);}
+ finally{mlSearchButton.disabled=!mlSession;mlReloadButton.disabled=!mlSession;}
+}
+mlLoginForm.addEventListener('submit',async event=>{
+ event.preventDefault();mlLoginButton.disabled=true;mlLoginButton.textContent='Conectando…';
+ try{
+  const email=document.getElementById('mlLoginEmail').value.trim().toLowerCase();
+  const password=document.getElementById('mlLoginPassword').value;
+  const {data,error}=await mlAuth.auth.signInWithPassword({email,password});
+  if(error)throw error;
+  if(data.user?.email?.toLowerCase()!==ML_ADMIN_EMAIL){await mlAuth.auth.signOut();throw new Error('Este acesso não tem permissão administrativa para o Garimpador.');}
+  setMlAuth(data.session);await loadMlItems();
+ }catch(error){document.getElementById('mlAuthStatus').textContent=error.message||'Não foi possível entrar.';setMlStatus(error.message||'Falha no acesso.',true);}
+ finally{mlLoginButton.disabled=false;mlLoginButton.textContent='Entrar para pesquisar';}
+});
+mlLogoutButton.addEventListener('click',async()=>{await mlAuth.auth.signOut();mlItems=[];renderMlResults();setMlAuth(null);setMlStatus('Você saiu do painel.');});
+mlSearchButton.addEventListener('click',runMlSearch);
+mlReloadButton.addEventListener('click',loadMlItems);
+mlCategory.addEventListener('change',renderMlResults);
+document.getElementById('mlQuery').addEventListener('input',renderMlResults);
+mlResults.addEventListener('click',async event=>{
+ const button=event.target.closest('[data-ml-action]');if(!button)return;
+ const card=button.closest('[data-ml-id]');if(!card)return;
+ const id=card.dataset.mlId,action=button.dataset.mlAction;
+ if(action==='ignore'&&!confirm('Ignorar este produto? Ele deixará de aparecer na lista do Garimpador.'))return;
+ button.disabled=true;
+ try{
+  if(action==='save-link'){
+   const input=card.querySelector('[data-affiliate-input]');
+   const affiliate_url=input?.value.trim()||'';
+   await mlRequest('save_affiliate_link',{id,affiliate_url});
+   setMlStatus('Link oficial de afiliado salvo. O produto continua pendente até você aprovar.');
+  }else if(action==='approve'){
+   await mlRequest('approve',{id});
+   setMlStatus('Produto aprovado para divulgação. Nenhuma publicação foi enviada.');
+  }else if(action==='ignore'){
+   await mlRequest('ignore',{id});
+   setMlStatus('Produto ignorado.');
+  }
+  await loadMlItems();
+ }catch(error){setMlStatus(error.message,true);}
+ finally{button.disabled=false;}
+});
+(async()=>{
+ const {data:sessionData,error}=await mlAuth.auth.getSession();
+ if(error){setMlStatus(error.message,true);return;}
+ const session=sessionData.session;
+ if(session){
+  if(session.user?.email?.toLowerCase()!==ML_ADMIN_EMAIL){await mlAuth.auth.signOut();setMlAuth(null);setMlStatus('A sessão encontrada não tem permissão administrativa.',true);return;}
+  setMlAuth(session);await loadMlItems();
+ }else setMlAuth(null);
+})();
