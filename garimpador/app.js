@@ -140,7 +140,8 @@ renderMlOffers();
 /* Área administrativa autenticada: pesquisa gratuita e revisão individual das ofertas. */
 (function initGarimpadorAdmin(){
  const loginArea=document.getElementById('autoLoginArea'),workArea=document.getElementById('autoWorkArea');
- if(!loginArea||!window.supabase?.createClient)return;
+ if(!loginArea)return;
+ if(!window.supabase?.createClient){document.getElementById('autoLoginStatus').textContent='A biblioteca de acesso não carregou. Confira sua conexão e atualize a página.';return;}
  const SUPABASE_URL='https://cwnkpbwnexzulutpnnoq.supabase.co';
  const SUPABASE_ANON='sb_publishable_pTrQXc1CSpuNwiQbbpYcXA_7HS94_h5';
  const EDGE_URL=SUPABASE_URL+'/functions/v1/garimpador-auto-search';
