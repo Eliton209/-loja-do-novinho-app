@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2463eb"><meta name="description" content="Garimpador LDN — seleção assistida de ofertas e links oficiais de afiliado.">
+<link rel="stylesheet" href="plano-b.css"><title>Garimpador LDN | Plano B</title>
+</head>
+<body>
+<header class="top"><a class="brand" href="index.html"><span>LDN</span><b>Garimpador <small>LOJA DO NOVINHO</small></b></a><span class="mode">PLANO B · ASSISTIDO</span></header>
+<main>
+<section class="intro"><p class="eyebrow">GARIMPADOR LDN</p><h1>Garimpe e prepare suas ofertas</h1><p>Pesquise no Mercado Livre, confira o menor preço entre anúncios equivalentes, abra o produto e depois cole aqui seu link oficial de afiliado.</p><div class="notice"><b>Importante:</b> esta versão não entra na sua conta nem gera links afiliados. Você gera o link no Portal de Afiliados e cola no campo de cada produto.</div></section>
+<section class="panel search-panel">
+<div class="section-title"><div><h2>1. Pesquisar produtos</h2><p>Faça buscas por nicho. O Mercado Livre será aberto com ordenação por menor preço.</p></div><span class="count" id="roundCount">0/20 ofertas</span></div>
+<div class="search-grid">
+<label>Nicho<select id="niche"><option>Eletrônicos</option><option>Celulares e acessórios</option><option>Informática</option><option>Casa e decoração</option><option>Cozinha</option><option>Cama, mesa e banho</option><option>Moda e acessórios</option><option>Beleza e cuidados pessoais</option><option>Ferramentas</option><option>Eletrodomésticos</option><option>Ofertas e promoções</option></select></label>
+<label>O que deseja encontrar?<input id="query" type="search" maxlength="100" placeholder="Ex.: fone bluetooth, air fryer, liquidificador"></label>
+<button id="searchButton" class="primary">Pesquisar menor preço ↗</button>
+</div><p class="hint">A busca abre os resultados do Mercado Livre ordenados por preço crescente. Compare produtos equivalentes, frete, variações, estado e reputação do vendedor antes de escolher.</p>
+</section>
+<section class="panel add-panel">
+<div class="section-title"><div><h2>2. Adicionar produto escolhido</h2><p>Depois de conferir o anúncio, registre os dados da oferta aqui.</p></div></div>
+<form id="productForm">
+<div class="form-grid">
+<label>Nome do produto<input id="productName" required maxlength="160" placeholder="Nome conforme o anúncio"></label>
+<label>Nicho<select id="productNiche"><option>Eletrônicos</option><option>Celulares e acessórios</option><option>Informática</option><option>Casa e decoração</option><option>Cozinha</option><option>Cama, mesa e banho</option><option>Moda e acessórios</option><option>Beleza e cuidados pessoais</option><option>Ferramentas</option><option>Eletrodomésticos</option><option>Ofertas e promoções</option></select></label>
+<label>Preço anunciado (R$)<input id="productPrice" required inputmode="decimal" placeholder="Ex.: 59,90"></label>
+<label>Imagem do produto (URL)<input id="productImage" type="url" placeholder="https://..."></label>
+<label class="wide">Link do anúncio original<input id="productUrl" type="url" required placeholder="Cole o endereço do produto no Mercado Livre"></label>
+</div>
+<div class="form-actions"><button class="primary" type="submit">Adicionar à minha seleção</button><span class="hint">Até 20 ofertas por rodada. O link de afiliado será inserido depois, no próprio cartão.</span></div>
+</form>
+</section>
+<section class="panel offers-panel">
+<div class="section-title"><div><h2>3. Minhas ofertas selecionadas</h2><p>Abra o anúncio original, gere seu link oficial e volte para colá-lo no cartão.</p></div><button id="clearRound" class="subtle">Limpar rodada</button></div>
+<div id="offers" class="offers"><p class="empty">Nenhuma oferta adicionada nesta rodada.</p></div>
+</section>
+<footer>GARIMPADOR LDN · Plano B assistido · Os links e dados ficam salvos neste aparelho.</footer>
+</main>
+<div id="toast" role="status" class="toast"></div>
+<script src="plano-b.js"></script>
+</body></html>
