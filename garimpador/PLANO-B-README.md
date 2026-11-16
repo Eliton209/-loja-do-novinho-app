@@ -8,8 +8,8 @@ Implementação isolada na branch `garimpador-plano-b-assistido`.
 3. Permite adicionar até 20 produtos à seleção local.
 4. Também permite cadastrar manualmente um produto e seu endereço original.
 5. Em cada cartão, o usuário abre o anúncio, gera o link no Portal de Afiliados e cola o link oficial no próprio Garimpador.
-6. A oferta só pode ser aprovada depois de salvar um link HTTPS.
-7. Somente ofertas aprovadas podem abrir a preparação de mensagem do WhatsApp. O envio continua sendo manual.
+6. O usuário pode filtrar a seleção por nicho e editar os dados do produto; qualquer edição retira a aprovação anterior.\n7. A oferta só pode ser aprovada depois de salvar um link HTTPS.
+8. Somente ofertas aprovadas podem abrir a preparação de mensagem do WhatsApp. O envio continua sendo manual.
 
 ## Precisão de preço
 - A busca pública é solicitada em ordem crescente de preço. Isso mostra os menores preços retornados para o termo, não prova o menor preço de todo o Mercado Livre.
@@ -34,3 +34,5 @@ Implementação isolada na branch `garimpador-plano-b-assistido`.
 A ordenação `price_asc` é documentada pelo Mercado Livre para o recurso de busca de listagens. Isso não é uma autorização nem uma API de geração de links de afiliado; são funcionalidades distintas. Consulte a [documentação oficial de Itens e Buscas](https://developers.mercadolivre.com.br/pt_br/itens-e-buscas).
 
 - Backup local em JSON pode ser exportado e restaurado pelo próprio usuário; restauração substitui a seleção atual e limita a 20 ofertas.
+
+- A validação do link é sintática (HTTPS); o sistema não consegue comprovar se o link foi gerado na conta de afiliado ou se terá comissão.
