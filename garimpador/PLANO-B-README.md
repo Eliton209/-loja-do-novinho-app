@@ -29,3 +29,6 @@ Implementação isolada na branch `garimpador-plano-b-assistido`.
 - `plano-b.css`
 - `plano-b.js`
 - `PLANO-B-README.md`
+
+## Referência técnica
+A ordenação `price_asc` é documentada pelo Mercado Livre para o recurso de busca de listagens. Isso não é uma autorização nem uma API de geração de links de afiliado; são funcionalidades distintas. Consulte a [documentação oficial de Itens e Buscas](https://developers.mercadolivre.com.br/pt_br/itens-e-buscas).
