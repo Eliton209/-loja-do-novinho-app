@@ -102,7 +102,8 @@ function renderMlResults(){
  if(!items.length){mlResults.innerHTML='<p class="ml-empty">Nenhum produto encontrado com esses filtros. Faça uma nova busca ou altere o filtro.</p>';return;}
  mlResults.innerHTML=items.map(p=>{
   const image=safeUrl(p.image_url),productUrl=safeUrl(p.product_url),affiliate=safeUrl(p.affiliate_url);
-  const status=p.status==='approved'?'Aprovado para divulgação':'Aguardando aprovação';
+  const destination=p.raw_data?.approval_destination||'storefront';
+  const status=p.status==='approved'?(destination==='whatsapp'?'Aprovado para WhatsApp':'Aprovado para vitrine · não publicado'):'Aguardando aprovação';
   return `<article class="ml-result-card" data-ml-id="${escapeHtml(p.id)}">
    ${image?`<img class="ml-result-image" src="${escapeHtml(image)}" alt="" loading="lazy">`:'<div class="ml-result-image ml-no-image">Sem imagem</div>'}
    <div class="ml-result-content">
@@ -114,9 +115,15 @@ function renderMlResults(){
     <label class="ml-affiliate-label">Deep Link — cole seu link oficial de afiliado
      <input class="ml-affiliate-input" data-affiliate-input="${escapeHtml(p.id)}" type="url" value="${escapeHtml(affiliate)}" placeholder="Cole aqui o link gerado na Central de Afiliados">
     </label>
+    <label class="ml-destination-label">Destino da oferta
+     <select data-destination="${escapeHtml(p.id)}" ${p.status==='approved'?'disabled':''}>
+      <option value="storefront" ${destination==='storefront'?'selected':''}>Vitrine da Loja do Novinho (aprovação; não publica ainda)</option>
+      <option value="whatsapp" ${destination==='whatsapp'?'selected':''}>WhatsApp (preparar compartilhamento)</option>
+     </select>
+    </label>
     <div class="actions ml-manage-actions">
      <button class="action" type="button" data-ml-action="save-link">${affiliate?'Atualizar link':'Salvar link de afiliado'}</button>
-     <button class="action whatsapp" type="button" data-ml-action="approve" ${affiliate?'':'disabled'}>Aprovar para divulgação</button>
+     ${p.status==='approved'?(destination==='whatsapp'?'<button class="action whatsapp" type="button" data-ml-action="open-whatsapp">Abrir WhatsApp</button>':'<span class="ml-approved-note">Aprovado para a fila da vitrine; ainda não publicado.</span>'):`<button class="action whatsapp" type="button" data-ml-action="approve" ${affiliate?'':'disabled'}>Confirmar destino e aprovar</button>`}
      <button class="action" type="button" data-ml-action="ignore">Excluir da lista</button>
     </div>
    </div>
@@ -174,8 +181,16 @@ mlResults.addEventListener('click',async event=>{
    await mlRequest('save_affiliate_link',{id,affiliate_url});
    setMlStatus('Link oficial de afiliado salvo. O produto continua pendente até você aprovar.');
   }else if(action==='approve'){
-   await mlRequest('approve',{id});
-   setMlStatus('Produto aprovado para divulgação. Nenhuma publicação foi enviada.');
+   const destination=card.querySelector('[data-destination]')?.value||'';
+   if(!['storefront','whatsapp'].includes(destination))throw new Error('Escolha vitrine ou WhatsApp antes de aprovar.');
+   await mlRequest('approve',{id,destination});
+   setMlStatus(destination==='whatsapp'?'Destino WhatsApp aprovado. Use “Abrir WhatsApp” para revisar e compartilhar manualmente.':'Destino vitrine aprovado. O produto continua sem publicação até uma etapa própria de publicação Wix.');
+  }else if(action==='open-whatsapp'){
+   const product=mlItems.find(item=>String(item.id)===id);
+   if(!product?.affiliate_url)throw new Error('Salve um link oficial de afiliado antes de compartilhar.');
+   const message=`🔥 OFERTA MERCADO LIVRE\n\n${product.title||'Achadinho da Loja do Novinho'}\n${moneyBRL(product.price)}\n\n${product.description||''}\n\nConfira aqui: ${product.affiliate_url}\n\nPreço e disponibilidade podem mudar.`;
+   window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
+   setMlStatus('WhatsApp aberto para você revisar e enviar a mensagem.');
   }else if(action==='ignore'){
    await mlRequest('ignore',{id});
    setMlStatus('Produto excluído da lista. Ele não será publicado.');
