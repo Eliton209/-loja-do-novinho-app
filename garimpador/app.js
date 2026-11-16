@@ -61,6 +61,24 @@ document.getElementById('closeDetails').addEventListener('click',()=>document.ge
 document.getElementById('details').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.close()});
 init();
 
+
+const ML_ASSISTED_TERMS=[
+ ['Eletrônicos','fone bluetooth'],['Eletrônicos','smart tv'],['Eletrônicos','smartphone'],['Eletrônicos','caixa de som bluetooth'],
+ ['Casa e decoração','organizador para casa'],['Casa e decoração','luminária decorativa'],['Casa e decoração','utilidades domésticas'],['Casa e decoração','decoração para sala'],
+ ['Cozinha','air fryer'],['Cozinha','liquidificador'],['Cozinha','jogo de panelas'],
+ ['Informática','mouse sem fio'],['Informática','teclado mecânico'],['Informática','monitor computador'],
+ ['Moda e acessórios','mochila'],['Moda e acessórios','relógio masculino'],['Moda e acessórios','tênis casual'],
+ ['Ofertas gerais','ofertas produtos casa'],['Ofertas gerais','produto em promoção'],['Ofertas gerais','utilidades domésticas']
+];
+function renderAssistedSearches(){
+ const host=document.getElementById('mlAssistedLinks');if(!host)return;
+ host.innerHTML=ML_ASSISTED_TERMS.map(([niche,term])=>{
+  const href='https://lista.mercadolivre.com.br/'+encodeURIComponent(term).replace(/%20/g,'-');
+  return `<a class="ml-assisted-link" href="${href}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(niche)}</span><b>${escapeHtml(term)}</b><small>Abrir busca ↗</small></a>`;
+ }).join('');
+}
+renderAssistedSearches();
+
 const mlCategory=document.getElementById('mlCategory');
 const mlResults=document.getElementById('mlResults');
 const mlStatus=document.getElementById('mlSearchStatus');
@@ -157,6 +175,27 @@ mlLoginForm.addEventListener('submit',async event=>{
  }catch(error){document.getElementById('mlAuthStatus').textContent=error.message||'Não foi possível entrar.';setMlStatus(error.message||'Falha no acesso.',true);}
  finally{mlLoginButton.disabled=false;mlLoginButton.textContent='Entrar para pesquisar';}
 });
+
+document.getElementById('mlManualForm').addEventListener('submit',async event=>{
+ event.preventDefault();
+ const button=document.getElementById('mlManualSave'),status=document.getElementById('mlManualStatus');
+ if(!mlSession){status.textContent='Entre no painel antes de cadastrar.';return;}
+ button.disabled=true;button.textContent='Salvando…';status.textContent='';
+ try{
+  const result=await mlRequest('manual_add',{
+   title:document.getElementById('mlManualTitle').value.trim(),
+   price:document.getElementById('mlManualPrice').value,
+   niche:document.getElementById('mlManualNiche').value,
+   product_url:document.getElementById('mlManualProductUrl').value.trim(),
+   affiliate_url:document.getElementById('mlManualAffiliateUrl').value.trim()
+  });
+  document.getElementById('mlManualForm').reset();
+  status.textContent='Produto salvo como pendente. Ele não foi publicado.';
+  await loadMlItems();
+ }catch(error){status.textContent=error.message||'Não foi possível salvar o produto.';}
+ finally{button.disabled=false;button.textContent='Salvar como pendente';}
+});
+
 mlLogoutButton.addEventListener('click',async()=>{await mlAuth.auth.signOut();mlItems=[];renderMlResults();setMlAuth(null);setMlStatus('Você saiu do painel.');});
 mlSearchButton.addEventListener('click',runMlSearch);
 mlReloadButton.addEventListener('click',loadMlItems);
