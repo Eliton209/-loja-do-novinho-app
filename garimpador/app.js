@@ -90,7 +90,7 @@ document.getElementById('mlOfferForm').addEventListener('submit',e=>{
  if(!saveMlOffers([item,...existing])){toast('O navegador não conseguiu salvar o produto.');return}
  e.currentTarget.reset();document.getElementById('offerCheckedAt').value='';updateOfferPreview();renderMlOffers();toast('Produto salvo para revisão.');
 });
-document.getElementById('searchMl').addEventListener('click',()=>{const q=document.getElementById('mlQuery').value.trim()||mlCategory.value;const slug=q.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');window.open(`https://lista.mercadolivre.com.br/${encodeURIComponent(slug)}`,'_blank','noopener,noreferrer');});
+document.getElementById('searchMl').addEventListener('click',()=>{const q=document.getElementById('mlQuery').value.trim()||mlCategory.value;const market=document.getElementById('offerMarket').value;if(market==='Magalu'){window.open('https://www.influenciadormagalu.com.br/lojadonovinho','_blank','noopener,noreferrer');toast('Na sua loja Magalu, abra o nicho “'+mlCategory.value+'” e procure “'+q+'”. Confirme se o produto está disponível para divulgação antes de salvar.');return;}const slug=q.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');window.open(`https://lista.mercadolivre.com.br/${encodeURIComponent(slug)}`,'_blank','noopener,noreferrer');});
 mlQueue.addEventListener('click',e=>{
  const card=e.target.closest('[data-ml-id]');if(!card)return;
  const items=readMlOffers(),item=items.find(p=>p.id===card.dataset.mlId);if(!item)return;
