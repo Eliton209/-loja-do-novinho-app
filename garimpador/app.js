@@ -111,7 +111,7 @@ function renderMlResults(){
     <strong class="ml-result-price">${moneyBRL(p.price)}</strong>
     <p class="ml-result-description">${escapeHtml(p.description||'Sem descrição adicional fornecida pelo anúncio.')}</p>
     <div class="ml-result-actions">${productUrl?`<a class="action" href="${escapeHtml(productUrl)}" target="_blank" rel="noopener noreferrer">Conferir anúncio</a>`:''}</div>
-    <label class="ml-affiliate-label">Seu link oficial de afiliado
+    <label class="ml-affiliate-label">Deep Link — cole seu link oficial de afiliado
      <input class="ml-affiliate-input" data-affiliate-input="${escapeHtml(p.id)}" type="url" value="${escapeHtml(affiliate)}" placeholder="Cole aqui o link gerado na Central de Afiliados">
     </label>
     <div class="actions ml-manage-actions">
