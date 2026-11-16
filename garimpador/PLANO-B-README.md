@@ -18,9 +18,9 @@ Implementação isolada na branch `garimpador-plano-b-assistido`.
 
 ## Limites
 - Não acessa a conta do usuário nem automatiza o Portal de Afiliados.
-- Não gera, valida a comissão ou presume que um link é afiliado; apenas exige um endereço HTTPS inserido pelo usuário.
-- Dados ficam no armazenamento local do navegador/aparelho; não sincronizam entre dispositivos.
-- Se a chamada pública da API falhar por rede/CORS, abre a página pública de busca ordenada por preço para continuar manualmente.
+- Não gera, valida a comissão ou presume que um link é afiliado; apenas exige um endereço HTTPS inserido pelo usuário. Se o link for trocado, a aprovação anterior é retirada.
+- Dados ficam no armazenamento local do navegador/aparelho; não sincronizam entre dispositivos. Use os botões Exportar backup e Restaurar backup para transferir ou preservar sua seleção.
+- Se a chamada pública da API falhar por rede/CORS, exibe um link clicável para a página pública de busca ordenada por menor preço (evita bloqueio de popup).
 - Sem publicação automática e sem deploy.
 - Não altera vitrine Wix, aplicativo cliente, integrações existentes ou branch main.
 
@@ -32,3 +32,5 @@ Implementação isolada na branch `garimpador-plano-b-assistido`.
 
 ## Referência técnica
 A ordenação `price_asc` é documentada pelo Mercado Livre para o recurso de busca de listagens. Isso não é uma autorização nem uma API de geração de links de afiliado; são funcionalidades distintas. Consulte a [documentação oficial de Itens e Buscas](https://developers.mercadolivre.com.br/pt_br/itens-e-buscas).
+
+- Backup local em JSON pode ser exportado e restaurado pelo próprio usuário; restauração substitui a seleção atual e limita a 20 ofertas.
