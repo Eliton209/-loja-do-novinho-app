@@ -184,8 +184,8 @@ renderMlOffers();
  };
  document.getElementById('autoLoginButton').addEventListener('click',async()=>{
   const button=document.getElementById('autoLoginButton');button.disabled=true;
-  try{const {error}=await client.auth.signInWithOtp({email:ADMIN_EMAIL,options:{emailRedirectTo:window.location.href.split('#')[0]}});if(error)throw error;message.textContent='Link de acesso enviado para o e-mail cadastrado. Abra a mensagem no mesmo aparelho e toque no link.';toast('Confira o e-mail cadastrado.');}
-  catch(e){message.textContent=e.message||'Não foi possível enviar o link de acesso.';toast(message.textContent);}
+  try{const {error}=await client.auth.signInWithOtp({email:ADMIN_EMAIL,options:{emailRedirectTo:window.location.href.split('#')[0]}});if(error)throw error;document.getElementById('autoLoginStatus').textContent='Link de acesso enviado para o e-mail cadastrado. Abra a mensagem no mesmo aparelho e toque no link.';toast('Confira o e-mail cadastrado.');}
+  catch(e){document.getElementById('autoLoginStatus').textContent=e.message||'Não foi possível enviar o link de acesso.';toast(document.getElementById('autoLoginStatus').textContent);}
   finally{button.disabled=false;}
  });
  document.getElementById('runAutoSearch').addEventListener('click',async()=>{
