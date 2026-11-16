@@ -62,24 +62,6 @@ document.getElementById('details').addEventListener('click',e=>{if(e.target===e.
 init();
 
 
-const ML_ASSISTED_TERMS=[
- ['Eletrônicos','fone bluetooth'],['Eletrônicos','smart tv'],['Eletrônicos','smartphone'],['Eletrônicos','caixa de som bluetooth'],
- ['Casa e decoração','organizador para casa'],['Casa e decoração','luminária decorativa'],['Casa e decoração','utilidades domésticas'],['Casa e decoração','decoração para sala'],
- ['Cozinha','air fryer'],['Cozinha','liquidificador'],['Cozinha','jogo de panelas'],
- ['Informática','mouse sem fio'],['Informática','teclado mecânico'],['Informática','monitor computador'],
- ['Moda e acessórios','mochila'],['Moda e acessórios','relógio masculino'],['Moda e acessórios','tênis casual'],
- ['Ofertas gerais','ofertas produtos casa'],['Ofertas gerais','produto em promoção'],['Ofertas gerais','utilidades domésticas']
-];
-function renderAssistedSearches(){
- const host=document.getElementById('mlAssistedLinks');if(!host)return;
- host.innerHTML=ML_ASSISTED_TERMS.map(([niche,term])=>{
-  const href='https://lista.mercadolivre.com.br/'+encodeURIComponent(term).replace(/%20/g,'-');
-  return `<a class="ml-assisted-link" href="${href}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(niche)}</span><b>${escapeHtml(term)}</b><small>Abrir busca ↗</small></a>`;
- }).join('');
-}
-renderAssistedSearches();
-
-const mlCategory=document.getElementById('mlCategory');
 const mlResults=document.getElementById('mlResults');
 const mlStatus=document.getElementById('mlSearchStatus');
 const mlLoginForm=document.getElementById('mlLoginForm');
@@ -116,8 +98,7 @@ function mlPriceSort(a,b){
 }
 function renderMlResults(){
  const q=document.getElementById('mlQuery').value.trim().toLocaleLowerCase('pt-BR');
- const niche=mlCategory.value;
- const items=mlItems.filter(p=>(!niche||p.niche===niche)&&(!q||`${p.title||''} ${p.description||''} ${p.niche||''}`.toLocaleLowerCase('pt-BR').includes(q))).sort(mlPriceSort);
+ const items=mlItems.filter(p=>(!q||`${p.title||''} ${p.description||''} ${p.niche||''}`.toLocaleLowerCase('pt-BR').includes(q))).sort(mlPriceSort);
  if(!items.length){mlResults.innerHTML='<p class="ml-empty">Nenhum produto encontrado com esses filtros. Faça uma nova busca ou altere o filtro.</p>';return;}
  mlResults.innerHTML=items.map(p=>{
   const image=safeUrl(p.image_url),productUrl=safeUrl(p.product_url),affiliate=safeUrl(p.affiliate_url);
@@ -136,7 +117,7 @@ function renderMlResults(){
     <div class="actions ml-manage-actions">
      <button class="action" type="button" data-ml-action="save-link">${affiliate?'Atualizar link':'Salvar link de afiliado'}</button>
      <button class="action whatsapp" type="button" data-ml-action="approve" ${affiliate?'':'disabled'}>Aprovar para divulgação</button>
-     <button class="action" type="button" data-ml-action="ignore">Ignorar</button>
+     <button class="action" type="button" data-ml-action="ignore">Excluir da lista</button>
     </div>
    </div>
   </article>`;
@@ -159,7 +140,7 @@ async function runMlSearch(){
   const result=await mlRequest('search');
   await loadMlItems();
   const found=Number(result.products_found||0),saved=Number(result.products_saved||0);
-  setMlStatus(found===0?(result.warning||'O Mercado Livre não retornou produtos nesta busca. A lista continua vazia; tente novamente mais tarde ou use a busca assistida no próprio Mercado Livre.'):`Busca concluída: ${found} produtos identificados e ${saved} registros salvos. Confira preços e anúncios antes de aprovar.`,found===0);
+  setMlStatus(found===0?(result.warning||'O Mercado Livre não retornou produtos nesta busca. A lista continua vazia; tente novamente mais tarde ou '):`Busca concluída: ${found} produtos identificados e ${saved} registros salvos. Confira preços e anúncios antes de aprovar.`,found===0);
  }catch(error){setMlStatus(error.message,true);}
  finally{mlSearchButton.disabled=!mlSession;mlReloadButton.disabled=!mlSession;}
 }
@@ -176,36 +157,15 @@ mlLoginForm.addEventListener('submit',async event=>{
  finally{mlLoginButton.disabled=false;mlLoginButton.textContent='Entrar para pesquisar';}
 });
 
-document.getElementById('mlManualForm').addEventListener('submit',async event=>{
- event.preventDefault();
- const button=document.getElementById('mlManualSave'),status=document.getElementById('mlManualStatus');
- if(!mlSession){status.textContent='Entre no painel antes de cadastrar.';return;}
- button.disabled=true;button.textContent='Salvando…';status.textContent='';
- try{
-  const result=await mlRequest('manual_add',{
-   title:document.getElementById('mlManualTitle').value.trim(),
-   price:document.getElementById('mlManualPrice').value,
-   niche:document.getElementById('mlManualNiche').value,
-   product_url:document.getElementById('mlManualProductUrl').value.trim(),
-   affiliate_url:document.getElementById('mlManualAffiliateUrl').value.trim()
-  });
-  document.getElementById('mlManualForm').reset();
-  status.textContent='Produto salvo como pendente. Ele não foi publicado.';
-  await loadMlItems();
- }catch(error){status.textContent=error.message||'Não foi possível salvar o produto.';}
- finally{button.disabled=false;button.textContent='Salvar como pendente';}
-});
-
 mlLogoutButton.addEventListener('click',async()=>{await mlAuth.auth.signOut();mlItems=[];renderMlResults();setMlAuth(null);setMlStatus('Você saiu do painel.');});
 mlSearchButton.addEventListener('click',runMlSearch);
 mlReloadButton.addEventListener('click',loadMlItems);
-mlCategory.addEventListener('change',renderMlResults);
 document.getElementById('mlQuery').addEventListener('input',renderMlResults);
 mlResults.addEventListener('click',async event=>{
  const button=event.target.closest('[data-ml-action]');if(!button)return;
  const card=button.closest('[data-ml-id]');if(!card)return;
  const id=card.dataset.mlId,action=button.dataset.mlAction;
- if(action==='ignore'&&!confirm('Ignorar este produto? Ele deixará de aparecer na lista do Garimpador.'))return;
+ if(action==='ignore'&&!confirm('Excluir este produto da sua lista? Ele será marcado como ignorado e não aparecerá nas próximas consultas.'))return;
  button.disabled=true;
  try{
   if(action==='save-link'){
@@ -218,7 +178,7 @@ mlResults.addEventListener('click',async event=>{
    setMlStatus('Produto aprovado para divulgação. Nenhuma publicação foi enviada.');
   }else if(action==='ignore'){
    await mlRequest('ignore',{id});
-   setMlStatus('Produto ignorado.');
+   setMlStatus('Produto excluído da lista. Ele não será publicado.');
   }
   await loadMlItems();
  }catch(error){setMlStatus(error.message,true);}
