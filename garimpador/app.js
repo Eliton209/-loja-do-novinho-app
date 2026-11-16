@@ -17,6 +17,16 @@ const PARTNER_STORES=[
   {id:'mercadolivre',name:'Mercado Livre',label:'Achadinhos da Loja do Novinho no Mercado Livre',url:'https://mercadolivre.com/sec/1BcC48a'},
  {id:'amazon',name:'Amazon',label:'Vitrine da Loja do Novinho na Amazon',url:'https://a.co/d/02OBfGU8'}
 ];
+function renderPartnerStores(){
+ const container=document.getElementById('partnerStores');
+ if(!container)return;
+ container.innerHTML=PARTNER_STORES.map(store=>`<article class="partner-store">
+  <div class="partner-store-mark">${store.id==='shopee'?'S':store.id==='amazon'?'A':'ML'}</div>
+  <div class="partner-store-info"><b>${escapeHtml(store.label)}</b><span>${escapeHtml(store.name)}</span>
+   <div class="actions"><a class="action" href="${escapeHtml(safeUrl(store.url))}" target="_blank" rel="noopener noreferrer">Abrir loja</a></div>
+  </div></article>`).join('');
+}
+renderPartnerStores();
 let products=Array.isArray(data?.products)?data.products.map(p=>({...p,category_display:normalizeCategory(p.category)})):[];
 const search=document.getElementById('search'),marketFilter=document.getElementById('marketFilter'),categoryFilter=document.getElementById('categoryFilter');
 function init(){if(!data||!products.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Nenhum produto real está disponível neste snapshot.</td></tr>';return}
