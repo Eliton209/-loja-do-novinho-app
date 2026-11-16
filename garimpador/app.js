@@ -102,7 +102,6 @@ mlQueue.addEventListener('click',e=>{
   window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
  }
 });
-renderMlOffers();return}if(e.target.dataset.mlAction==='send'){const price=item.price?`\n💰 ${item.price}`:'';const desc=item.description?`\n\n${item.description}`:'';const image=item.image_url?`\n🖼 Imagem do produto: ${item.image_url}`:'';const message=`🔥 OFERTA MERCADO LIVRE\n\n${item.name}${price}${desc}${image}\n\nConfira a oferta pelo link:\n${item.affiliate_url}\n\nPreço e disponibilidade podem mudar.`;window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');}});
 renderMlOffers();
 
 
@@ -122,7 +121,7 @@ renderMlOffers();
  const style=document.createElement('style');style.textContent='.free-compare{margin-top:22px}.free-compare-note{background:#eff6ff;border:1px solid #dbeafe;border-radius:12px;padding:14px;margin:14px 0}.free-compare-note p{margin:6px 0 0;color:#475569;line-height:1.5}.compare-search{display:grid;gap:12px;margin:16px 0}.compare-search label,.compare-entry label{display:grid;gap:6px;font-size:13px;font-weight:650;color:#475569}.compare-search input,.compare-entry input{width:100%;min-width:0;padding:12px;border:1px solid #cbd5e1;border-radius:9px;font:inherit}.compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.compare-entry{border:1px solid #e2e8f0;border-radius:12px;padding:14px;display:grid;gap:10px;min-width:0}.compare-entry h3{margin:0 0 4px}.same-product{display:flex;align-items:center;gap:9px;margin:16px 0;font-weight:650}.same-product input{width:18px;height:18px}.compare-result{margin-top:14px;padding:14px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;line-height:1.55}.compare-result strong{color:#166534}.compare-foot{font-size:12px;color:#64748b;margin-top:12px}@media(max-width:650px){.compare-grid{grid-template-columns:1fr}.compare-search .actions{display:grid;grid-template-columns:1fr 1fr}}';document.head.append(style);
  const q=()=>document.getElementById('compareQuery').value.trim();
  document.getElementById('openCompareML').addEventListener('click',()=>{if(!q()){toast('Digite o produto que deseja pesquisar.');return}window.open('https://lista.mercadolivre.com.br/'+encodeURIComponent(q().replace(/\s+/g,'-')),'_blank','noopener,noreferrer')});
- document.getElementById('openCompareMagalu').addEventListener('click',()=>{if(!q()){toast('Digite o produto que deseja pesquisar.');return}window.open('https://www.magazineluiza.com.br/busca/'+encodeURIComponent(q()),'_blank','noopener,noreferrer')});
+ document.getElementById('openCompareMagalu').addEventListener('click',()=>{window.open('https://www.influenciadormagalu.com.br/lojadonovinho','_blank','noopener,noreferrer');toast('Na sua loja Magalu, procure o produto dentro do nicho correspondente e confirme se está disponível para divulgação.');});
  const price=v=>{const n=Number(String(v).trim().replace(/\./g,'').replace(',','.'));return Number.isFinite(n)&&n>0?n:null};
  const money=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
  document.getElementById('comparePrices').addEventListener('click',()=>{
