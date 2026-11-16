@@ -54,10 +54,56 @@ renderPartnerStores();
 ML_NICHES.forEach(n=>mlCategory.add(new Option(n,n)));
 function readMlOffers(){try{return JSON.parse(localStorage.getItem(mlStorageKey)||'[]')}catch{return[]}}
 function saveMlOffers(items){try{localStorage.setItem(mlStorageKey,JSON.stringify(items));return true}catch{return false}}
-function renderMlOffers(){const items=readMlOffers();document.getElementById('mlQueueCount').textContent=`${items.length} ${items.length===1?'oferta salva':'ofertas salvas'} neste aparelho`;mlQueue.innerHTML=items.length?items.map(p=>`<article class="ml-offer-card" data-ml-id="${escapeHtml(p.id)}">${safeUrl(p.image_url)?`<img src="${escapeHtml(safeUrl(p.image_url))}" alt="" loading="lazy">`:''}<div class="ml-offer-info"><b>${escapeHtml(p.name)}</b><span>${escapeHtml(p.category)} · ${escapeHtml(p.price||'Preço não informado')}</span><div class="actions"><button class="action whatsapp" data-ml-action="send">Preparar WhatsApp</button><button class="action" data-ml-action="remove">Remover</button></div></div></article>`).join(''):'<p class="ml-empty">Nenhuma oferta selecionada. Pesquise no Mercado Livre e salve aqui os produtos que você conferir.</p>';}
+function offerCard(p){
+ const image=safeUrl(p.image_url),productUrl=safeUrl(p.product_url),affiliate=safeUrl(p.affiliate_url);
+ const price=p.price?escapeHtml(p.price):'Preço não informado';
+ const market=escapeHtml(p.marketplace||'Plataforma não identificada');
+ const specs=escapeHtml(p.model||'Modelo/versão não informado');
+ const seller=escapeHtml(p.seller||'Vendedor não informado');
+ const shipping=escapeHtml(p.shipping||'Frete a consultar');
+ const checked=fmtDate(p.checked_at||p.added_at);
+ return '<article class="review-offer-card" data-ml-id="'+escapeHtml(p.id)+'">'+
+ '<div class="review-offer-photo">'+(image?'<img src="'+escapeHtml(image)+'" alt="Foto de '+escapeHtml(p.name)+'" loading="lazy" onerror="this.parentElement.innerHTML=\'<span>Imagem indisponível</span>\'">':'<span>Foto não informada</span>')+'</div>'+
+ '<div class="review-offer-content"><div class="review-offer-top"><span class="review-market">'+market+'</span><span class="review-niche">'+escapeHtml(p.category||'Sem nicho')+'</span></div>'+
+ '<h3>'+escapeHtml(p.name||'Produto sem nome')+'</h3><div class="review-price">'+price+'</div>'+
+ '<div class="review-specs"><span><b>Modelo:</b> '+specs+'</span><span><b>Vendedor:</b> '+seller+'</span><span><b>Entrega:</b> '+shipping+'</span></div>'+
+ (p.description?'<p class="review-description">'+escapeHtml(p.description)+'</p>':'')+
+ '<small class="review-time">Preço conferido: '+escapeHtml(checked)+' · Informado manualmente</small>'+
+ '<div class="actions">'+(productUrl?'<a class="action" href="'+escapeHtml(productUrl)+'" target="_blank" rel="noopener noreferrer">Ver anúncio</a>':'')+
+ (affiliate?'<a class="action" href="'+escapeHtml(affiliate)+'" target="_blank" rel="noopener noreferrer">Link afiliado</a>':'<span class="review-pending">Link afiliado pendente</span>')+
+ '<button class="action whatsapp" data-ml-action="send" '+(!affiliate?'disabled title="Adicione seu link de afiliado para divulgar"':'')+'>Preparar WhatsApp</button><button class="action" data-ml-action="remove">Remover</button></div></div></article>';
+}
+function renderMlOffers(){const items=readMlOffers();document.getElementById('mlQueueCount').textContent=items.length+' '+(items.length===1?'produto salvo':'produtos salvos')+' neste aparelho';mlQueue.innerHTML=items.length?items.map(offerCard).join(''):'<p class="ml-empty">Nenhum produto salvo. Pesquise nas lojas e adicione os dados do anúncio para revisar aqui.</p>';}
+function updateOfferPreview(){
+ const name=document.getElementById('mlName').value.trim(),image=safeUrl(document.getElementById('mlImage').value),price=document.getElementById('mlPrice').value.trim(),market=document.getElementById('offerMarket').value,desc=document.getElementById('mlDescription').value.trim(),model=document.getElementById('mlModel').value.trim();
+ document.getElementById('mlCheckedAt').value=new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short'}).format(new Date());
+ document.getElementById('offerDraftPreview').innerHTML=(image?'<img src="'+escapeHtml(image)+'" alt="Prévia do produto" onerror="this.style.display=\'none\'">':'<div class="draft-no-image">Foto ainda não informada</div>')+'<div><span>'+escapeHtml(market)+' · '+escapeHtml(mlCategory.value)+'</span><b>'+escapeHtml(name||'Nome do produto')+'</b><strong>'+escapeHtml(price||'Preço não informado')+'</strong><small>'+escapeHtml(model||desc||'Detalhes do produto aparecerão aqui')+'</small></div>';
+}
+['mlName','mlImage','mlPrice','mlDescription','mlModel','offerMarket'].forEach(id=>document.getElementById(id).addEventListener('input',updateOfferPreview));
+document.getElementById('mlOfferForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const name=document.getElementById('mlName').value.trim(),productUrl=safeUrl(document.getElementById('mlProductUrl').value),affiliateRaw=document.getElementById('mlAffiliate').value.trim(),affiliate=affiliateRaw?safeUrl(affiliateRaw):'';
+ if(!name){toast('Informe o nome do produto.');return}
+ if(affiliateRaw&&!affiliate){toast('O link de afiliado precisa começar com https://.');return}
+ const existing=readMlOffers(),item={id:'offer-'+Date.now(),marketplace:document.getElementById('offerMarket').value,name,category:mlCategory.value,price:document.getElementById('mlPrice').value.trim(),description:document.getElementById('mlDescription').value.trim(),image_url:safeUrl(document.getElementById('mlImage').value.trim()),product_url:productUrl,model:document.getElementById('mlModel').value.trim(),seller:document.getElementById('mlSeller').value.trim(),shipping:document.getElementById('mlShipping').value.trim(),affiliate_url:affiliate,added_at:new Date().toISOString(),checked_at:new Date().toISOString()};
+ if(productUrl&&existing.some(p=>p.product_url===productUrl)){toast('Esse anúncio já está salvo.');return}
+ if(!saveMlOffers([item,...existing])){toast('O navegador não conseguiu salvar o produto.');return}
+ e.currentTarget.reset();document.getElementById('mlCheckedAt').value='';updateOfferPreview();renderMlOffers();toast('Produto salvo para revisão.');
+});
 document.getElementById('searchMl').addEventListener('click',()=>{const q=document.getElementById('mlQuery').value.trim()||mlCategory.value;const slug=q.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');window.open(`https://lista.mercadolivre.com.br/${encodeURIComponent(slug)}`,'_blank','noopener,noreferrer');});
 document.getElementById('mlOfferForm').addEventListener('submit',e=>{e.preventDefault();const name=document.getElementById('mlName').value.trim(),affiliate=safeUrl(document.getElementById('mlAffiliate').value.trim());if(!name||!affiliate){toast('Informe um nome e um link https de afiliado válido.');return}const existing=readMlOffers();if(existing.some(p=>p.affiliate_url===affiliate)){toast('Esse link já está na fila deste aparelho.');return}const item={id:`ml-${Date.now()}`,marketplace:'Mercado Livre',name,category:mlCategory.value,price:document.getElementById('mlPrice').value.trim(),description:document.getElementById('mlDescription').value.trim(),image_url:safeUrl(document.getElementById('mlImage').value.trim()),affiliate_url:affiliate,added_at:new Date().toISOString()};if(!saveMlOffers([item,...existing])){toast('O navegador não conseguiu salvar esta oferta.');return}e.currentTarget.reset();renderMlOffers();toast('Oferta salva neste aparelho.');});
-mlQueue.addEventListener('click',e=>{const card=e.target.closest('[data-ml-id]');if(!card)return;const items=readMlOffers(),item=items.find(p=>p.id===card.dataset.mlId);if(!item)return;if(e.target.dataset.mlAction==='remove'){saveMlOffers(items.filter(p=>p.id!==item.id));renderMlOffers();return}if(e.target.dataset.mlAction==='send'){const price=item.price?`\n💰 ${item.price}`:'';const desc=item.description?`\n\n${item.description}`:'';const image=item.image_url?`\n🖼 Imagem do produto: ${item.image_url}`:'';const message=`🔥 OFERTA MERCADO LIVRE\n\n${item.name}${price}${desc}${image}\n\nConfira a oferta pelo link:\n${item.affiliate_url}\n\nPreço e disponibilidade podem mudar.`;window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');}});
+mlQueue.addEventListener('click',e=>{
+ const card=e.target.closest('[data-ml-id]');if(!card)return;
+ const items=readMlOffers(),item=items.find(p=>p.id===card.dataset.mlId);if(!item)return;
+ if(e.target.dataset.mlAction==='remove'){saveMlOffers(items.filter(p=>p.id!==item.id));renderMlOffers();return}
+ if(e.target.dataset.mlAction==='send'){
+  if(!safeUrl(item.affiliate_url)){toast('Adicione o link de afiliado antes de preparar a divulgação.');return}
+  const price=item.price?'\n💰 '+item.price:'',desc=item.description?'\n\n'+item.description:'',url=item.affiliate_url;
+  const message='🔥 OFERTA '+String(item.marketplace||'').toLocaleUpperCase('pt-BR')+'\n\n'+item.name+price+desc+'\n\nConfira a oferta pelo link:\n'+url+'\n\nPreço e disponibilidade podem mudar.';
+  window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
+ }
+});
+renderMlOffers();return}if(e.target.dataset.mlAction==='send'){const price=item.price?`\n💰 ${item.price}`:'';const desc=item.description?`\n\n${item.description}`:'';const image=item.image_url?`\n🖼 Imagem do produto: ${item.image_url}`:'';const message=`🔥 OFERTA MERCADO LIVRE\n\n${item.name}${price}${desc}${image}\n\nConfira a oferta pelo link:\n${item.affiliate_url}\n\nPreço e disponibilidade podem mudar.`;window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');}});
 renderMlOffers();
 
 
