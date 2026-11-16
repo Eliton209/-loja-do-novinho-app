@@ -141,7 +141,7 @@ async function runMlSearch(){
   const result=await mlRequest('search');
   await loadMlItems();
   const found=Number(result.products_found||0),saved=Number(result.products_saved||0);
-  setMlStatus(`Busca concluída: ${found} produtos identificados e ${saved} registros salvos. Confira preços e anúncios antes de aprovar.`,found===0);
+  setMlStatus(found===0?(result.warning||'O Mercado Livre não retornou produtos nesta busca. A lista continua vazia; tente novamente mais tarde ou use a busca assistida no próprio Mercado Livre.'):`Busca concluída: ${found} produtos identificados e ${saved} registros salvos. Confira preços e anúncios antes de aprovar.`,found===0);
  }catch(error){setMlStatus(error.message,true);}
  finally{mlSearchButton.disabled=!mlSession;mlReloadButton.disabled=!mlSession;}
 }
