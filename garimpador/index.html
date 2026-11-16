@@ -27,6 +27,25 @@
 </div>
 <div class="ml-search-status" id="mlSearchStatus" role="status">Entre no painel para carregar a lista de produtos.</div>
 <div class="ml-results" id="mlResults"><p class="ml-empty">Nenhuma oportunidade carregada ainda.</p></div>
+<div class="ml-assisted" id="mlAssisted">
+ <h3>Busca assistida no Mercado Livre</h3>
+ <p>Se a consulta automática estiver bloqueada, abra uma busca por nicho. No Mercado Livre, escolha um produto individual e confira o preço e o anúncio.</p>
+ <div class="ml-assisted-grid" id="mlAssistedLinks"></div>
+ <p class="ml-assisted-note">Importante: gere o link de afiliado somente depois de abrir a página de um produto específico. O Mercado Livre não permite gerar comissão usando links de páginas de busca.</p>
+</div>
+<div class="ml-manual">
+ <h3>Adicionar produto encontrado</h3>
+ <p>Depois de gerar o link oficial de afiliado, registre aqui o produto para ele ficar pendente de sua aprovação.</p>
+ <form id="mlManualForm" class="ml-manual-form">
+  <label>Nome do produto<input id="mlManualTitle" required maxlength="250" placeholder="Nome conforme aparece no anúncio"></label>
+  <label>Preço encontrado (R$)<input id="mlManualPrice" type="number" min="0.01" step="0.01" placeholder="Ex.: 129,90"></label>
+  <label>Nicho<select id="mlManualNiche" required><option value="">Selecione</option><option>Eletrônicos</option><option>Casa e decoração</option><option>Cozinha</option><option>Informática</option><option>Moda e acessórios</option><option>Ofertas gerais</option></select></label>
+  <label>Link do produto no Mercado Livre<input id="mlManualProductUrl" type="url" required placeholder="https://www.mercadolivre.com.br/..."></label>
+  <label>Seu link oficial de afiliado<input id="mlManualAffiliateUrl" type="url" required placeholder="https://meli.la/..."></label>
+  <button class="action whatsapp" id="mlManualSave" type="submit">Salvar como pendente</button>
+ </form>
+ <div class="ml-manual-status" id="mlManualStatus" role="status"></div>
+</div>
 </section>
 <section class="panel source" id="origem"><div class="source-icon">↻</div><div><h2>Fonte e limites desta leitura</h2><p id="sourceText"></p><ul><li>A coleção lida foi <code>AffiliateProducts</code>, com filtro <code>published = true</code>.</li><li>O Wix Stores V3 está instalado no site, mas a consulta ao catálogo nativo retornou zero produtos; os anúncios estão na coleção CMS.</li><li>O Garimpador usa um snapshot local sem tokens no navegador. Esta cópia não se atualiza sozinha: é preciso gerar outra leitura para refletir novas alterações da vitrine.</li><li>O preço capturado do título/descrição é texto cadastrado, não uma consulta atual ao marketplace.</li><li>“Copiar oferta” monta o texto com o link de afiliado já salvo no cadastro do produto. Cole a mensagem pronta no grupo do WhatsApp; não é necessário inserir o link manualmente. “Abrir WhatsApp” segue disponível como opção assistida.</li></ul></section><footer>GARIMPADOR LDN <span>·</span> Sem alterações na vitrine Wix</footer></main>
 <dialog id="offerPreview"><button class="close" id="closeOfferPreview" aria-label="Fechar">×</button><h2 id="offerProductName">Oferta preparada</h2><p>Confira a mensagem e o link abaixo. Depois, copie e cole no WhatsApp.</p><textarea id="offerText" rows="14" readonly></textarea><p id="offerLinkStatus" class="offer-link-status"></p><button class="action whatsapp" id="copyPreparedOffer">Copiar oferta</button></dialog><dialog id="details"><button class="close" id="closeDetails" aria-label="Fechar">×</button><div id="detailContent"></div></dialog><div id="toast" role="status" class="toast"></div><script src="products-data-live.js"></script><script type="module" src="app.js"></script></body></html>
