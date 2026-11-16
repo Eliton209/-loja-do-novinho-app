@@ -60,10 +60,3 @@ document.getElementById('mlOfferForm').addEventListener('submit',e=>{e.preventDe
 mlQueue.addEventListener('click',e=>{const card=e.target.closest('[data-ml-id]');if(!card)return;const items=readMlOffers(),item=items.find(p=>p.id===card.dataset.mlId);if(!item)return;if(e.target.dataset.mlAction==='remove'){saveMlOffers(items.filter(p=>p.id!==item.id));renderMlOffers();return}if(e.target.dataset.mlAction==='send'){const price=item.price?`\n💰 ${item.price}`:'';const desc=item.description?`\n\n${item.description}`:'';const image=item.image_url?`\n🖼 Imagem do produto: ${item.image_url}`:'';const message=`🔥 OFERTA MERCADO LIVRE\n\n${item.name}${price}${desc}${image}\n\nConfira a oferta pelo link:\n${item.affiliate_url}\n\nPreço e disponibilidade podem mudar.`;window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');}});
 renderMlOffers();
 
-let installPrompt=null;
-const installButton=document.getElementById('installApp');
-window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;installButton.classList.add('install-ready');});
-installButton.addEventListener('click',async()=>{if(!window.isSecureContext){toast('Para instalar no Samsung, o Garimpador precisa estar publicado em um endereço HTTPS.');return}if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;return}toast('A instalação como aplicativo não foi oferecida por este navegador. Abra no Google Chrome e escolha menu ⋮ > “Instalar app”. Não use “Adicionar à tela inicial”, pois pode criar apenas um atalho.');});
-window.addEventListener('appinstalled',()=>{installPrompt=null;toast('Garimpador adicionado à tela inicial.');});
-if('serviceWorker' in navigator && window.isSecureContext){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));}
-
