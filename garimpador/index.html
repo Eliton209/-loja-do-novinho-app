@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#2463eb"><meta name="description" content="Garimpador LDN — menores preços da Loja do Novinho e preparação assistida para WhatsApp."><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css"><title>Garimpador LDN | Menores Preços</title></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#2463eb"><meta name="description" content="Garimpador LDN — menores preços da Loja do Novinho e aprovação manual para vitrine ou WhatsApp."><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css"><title>Garimpador LDN | Menores Preços</title></head>
 <body><aside class="sidebar"><div class="brand"><span class="brand-icon">LDN</span><span><b>Garimpador</b><small>LOJA DO NOVINHO</small></span></div><nav><a class="active" href="#catalogo"><span>▦</span> Vitrine</a><a href="#lojasParceiras"><span>↗</span> Lojas</a><a href="#pesquisaML"><span>⌕</span> Garimpo ML</a><a href="#origem"><span>⛓</span> Dados</a></nav><div class="side-note"><i></i><div><b>Somente leitura</b><small>Esta cópia não altera a loja Wix.</small></div></div></aside>
 <main><header><div><p class="eyebrow">GARIMPADOR LDN · DADOS DA LOJA</p><h1>Catálogo da vitrine</h1><p class="subtitle">Produtos publicados na coleção real da Loja do Novinho.</p></div><div class="header-tools"><div class="snapshot"><span class="status-dot"></span><span>Snapshot local<br><small id="snapshotDate">Carregando data…</small></span></div></div></header>
 <section class="stats"><article><span>Produtos publicados</span><strong id="totalProducts">—</strong><small>Registros Wix publicados</small></article><article><span>Marketplaces</span><strong id="totalMarkets">—</strong><small id="marketNames">Fonte dos produtos</small></article><article><span>Nichos cadastrados</span><strong id="totalCategories">—</strong><small>Conforme categoria da vitrine</small></article><article><span>Links afiliados</span><strong id="affiliateLinks">—</strong><small>URLs disponíveis na coleção</small></article></section>
@@ -19,33 +19,9 @@
 <div class="ml-auth-status" id="mlAuthStatus" role="status">Entre com seu acesso administrativo para pesquisar e gerenciar as oportunidades.</div>
 <button class="action" id="mlLogoutButton" type="button" hidden>Sair do painel</button>
 </div>
-<div class="ml-search">
-<label>Filtrar por nicho<select id="mlCategory"><option value="">Todos os nichos</option><option>Eletrônicos</option><option>Casa e decoração</option><option>Cozinha</option><option>Informática</option><option>Moda e acessórios</option><option>Ofertas gerais</option></select></label>
-<label>Filtrar produtos<input id="mlQuery" type="search" placeholder="Ex.: fone, air fryer, mochila"></label>
-<button class="action whatsapp" id="searchMl" type="button" disabled>Buscar menores preços</button>
-<button class="action" id="reloadMl" type="button" disabled>Atualizar lista</button>
-</div>
+<div class="ml-search"><button class="action whatsapp" id="searchMl" type="button" disabled>Garimpar até 20 produtos</button><button class="action" id="reloadMl" type="button" disabled>Atualizar lista</button></div>
 <div class="ml-search-status" id="mlSearchStatus" role="status">Entre no painel para carregar a lista de produtos.</div>
 <div class="ml-results" id="mlResults"><p class="ml-empty">Nenhuma oportunidade carregada ainda.</p></div>
-<div class="ml-assisted" id="mlAssisted">
- <h3>Busca assistida no Mercado Livre</h3>
- <p>Se a consulta automática estiver bloqueada, abra uma busca por nicho. No Mercado Livre, escolha um produto individual e confira o preço e o anúncio.</p>
- <div class="ml-assisted-grid" id="mlAssistedLinks"></div>
- <p class="ml-assisted-note">Importante: gere o link de afiliado somente depois de abrir a página de um produto específico. O Mercado Livre não permite gerar comissão usando links de páginas de busca.</p>
-</div>
-<div class="ml-manual">
- <h3>Adicionar produto encontrado</h3>
- <p>Depois de gerar o link oficial de afiliado, registre aqui o produto para ele ficar pendente de sua aprovação.</p>
- <form id="mlManualForm" class="ml-manual-form">
-  <label>Nome do produto<input id="mlManualTitle" required maxlength="250" placeholder="Nome conforme aparece no anúncio"></label>
-  <label>Preço encontrado (R$)<input id="mlManualPrice" type="number" min="0.01" step="0.01" placeholder="Ex.: 129,90"></label>
-  <label>Nicho<select id="mlManualNiche" required><option value="">Selecione</option><option>Eletrônicos</option><option>Casa e decoração</option><option>Cozinha</option><option>Informática</option><option>Moda e acessórios</option><option>Ofertas gerais</option></select></label>
-  <label>Link do produto no Mercado Livre<input id="mlManualProductUrl" type="url" required placeholder="https://www.mercadolivre.com.br/..."></label>
-  <label>Seu link oficial de afiliado<input id="mlManualAffiliateUrl" type="url" required placeholder="https://meli.la/..."></label>
-  <button class="action whatsapp" id="mlManualSave" type="submit">Salvar como pendente</button>
- </form>
- <div class="ml-manual-status" id="mlManualStatus" role="status"></div>
-</div>
 </section>
 <section class="panel source" id="origem"><div class="source-icon">↻</div><div><h2>Fonte e limites desta leitura</h2><p id="sourceText"></p><ul><li>A coleção lida foi <code>AffiliateProducts</code>, com filtro <code>published = true</code>.</li><li>O Wix Stores V3 está instalado no site, mas a consulta ao catálogo nativo retornou zero produtos; os anúncios estão na coleção CMS.</li><li>O Garimpador usa um snapshot local sem tokens no navegador. Esta cópia não se atualiza sozinha: é preciso gerar outra leitura para refletir novas alterações da vitrine.</li><li>O preço capturado do título/descrição é texto cadastrado, não uma consulta atual ao marketplace.</li><li>“Copiar oferta” monta o texto com o link de afiliado já salvo no cadastro do produto. Cole a mensagem pronta no grupo do WhatsApp; não é necessário inserir o link manualmente. “Abrir WhatsApp” segue disponível como opção assistida.</li></ul></section><footer>GARIMPADOR LDN <span>·</span> Sem alterações na vitrine Wix</footer></main>
 <dialog id="offerPreview"><button class="close" id="closeOfferPreview" aria-label="Fechar">×</button><h2 id="offerProductName">Oferta preparada</h2><p>Confira a mensagem e o link abaixo. Depois, copie e cole no WhatsApp.</p><textarea id="offerText" rows="14" readonly></textarea><p id="offerLinkStatus" class="offer-link-status"></p><button class="action whatsapp" id="copyPreparedOffer">Copiar oferta</button></dialog><dialog id="details"><button class="close" id="closeDetails" aria-label="Fechar">×</button><div id="detailContent"></div></dialog><div id="toast" role="status" class="toast"></div><script src="products-data-live.js"></script><script type="module" src="app.js"></script></body></html>
