@@ -99,7 +99,40 @@ if (isStandalone) {
   void confirmInstallationOnce();
 }
 
+// Se o Chrome não puder ser aberto pelo link de intenção, o Android
+// retorna à página no navegador de origem com este parâmetro de fallback.
+if (new URLSearchParams(location.search).get("ldn_install_fallback") === "1") {
+  installHelpText.textContent =
+    "O Chrome não abriu automaticamente. No Facebook, toque no menu ⋯ e escolha " +
+    "“Abrir no navegador” ou “Abrir no Chrome”. Depois, toque em INSTALAR APLICATIVO.";
+  installHelp.hidden = false;
+}
+
 installButton.addEventListener("click", async () => {
+  // O navegador interno do Facebook no Android normalmente não oferece
+  // o evento beforeinstallprompt. Tenta abrir esta mesma página no Chrome.
+  const isFacebookAndroid = /Android/i.test(navigator.userAgent) &&
+    /(FBAN|FBAV|FB_IAB|Facebook)/i.test(navigator.userAgent);
+
+  if (isFacebookAndroid) {
+    const fallbackUrl = new URL(window.location.href);
+    fallbackUrl.searchParams.set("ldn_install_fallback", "1");
+
+    const chromeIntent =
+      "intent://" + location.host + location.pathname + location.search + location.hash +
+      "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
+      encodeURIComponent(fallbackUrl.toString()) + ";end";
+
+    installHelpText.textContent =
+      "Estamos tentando abrir esta página no Chrome para facilitar a instalação. " +
+      "Se isso não acontecer, toque no menu ⋯ do Facebook e escolha “Abrir no navegador”.";
+    installHelp.hidden = false;
+
+    // A abertura externa é solicitada diretamente no toque do usuário.
+    window.location.href = chromeIntent;
+    return;
+  }
+
   if (!deferredInstallPrompt) {
     showInstallHelp();
     return;
