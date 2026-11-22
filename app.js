@@ -205,8 +205,8 @@ window.addEventListener("appinstalled", () => {
 function retryPendingInstallationConfirmation() {
   if (!isStandalone) return;
   try {
-    if (localStorage.getItem("ldn_install_confirmation_pending_v1") === "1" &&
-        localStorage.getItem("ldn_install_confirmed_v1") !== "1") {
+    if (localStorage.getItem("ldn_install_confirmation_pending_v2") &&
+        localStorage.getItem("ldn_install_confirmed_v2") !== "1") {
       void confirmInstallationOnce();
     }
   } catch (_) {
