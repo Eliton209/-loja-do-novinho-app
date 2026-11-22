@@ -15,12 +15,12 @@ function deviceToken() {
   return token;
 }
 
-async function trackEvent(eventType) {
+async function trackEvent(eventType, tokenOverride = null) {
   try {
     const body = JSON.stringify({
       event_type: eventType,
       source: "app",
-      device_token: deviceToken(),
+      device_token: tokenOverride || deviceToken(),
       path: location.pathname
     });
     const response = await fetch(METRICS_ENDPOINT, {
@@ -54,26 +54,47 @@ function markAsInstalled() {
   installHelp.hidden = true;
 }
 
+function prepareInstallationConfirmation() {
+  const pendingKey = "ldn_install_confirmation_pending_v2";
+  const confirmedKey = "ldn_install_confirmed_v2";
+  try {
+    if (!localStorage.getItem(pendingKey)) {
+      localStorage.setItem(pendingKey, crypto.randomUUID());
+    }
+    localStorage.removeItem(confirmedKey);
+  } catch (_) {
+    // The confirmation function has a temporary-token fallback.
+  }
+  installationConfirmationPromise = null;
+}
+
 function confirmInstallationOnce() {
   if (installationConfirmationPromise) return installationConfirmationPromise;
 
   installationConfirmationPromise = (async () => {
-    const key = "ldn_install_confirmed_v1";
-    const pendingKey = "ldn_install_confirmation_pending_v1";
+    const key = "ldn_install_confirmed_v2";
+    const pendingKey = "ldn_install_confirmation_pending_v2";
+    let installToken = null;
+
     try {
-      if (localStorage.getItem(key) === "1") return;
-      localStorage.setItem(pendingKey, "1");
+      installToken = localStorage.getItem(pendingKey);
+      if (!installToken) {
+        if (localStorage.getItem(key) === "1") return;
+        installToken = crypto.randomUUID();
+        localStorage.setItem(pendingKey, installToken);
+      }
     } catch (_) {
-      // The database also deduplicates confirmations by device.
+      // If browser storage is unavailable, still attempt this real confirmation.
+      installToken = crypto.randomUUID();
     }
 
-    const accepted = await trackEvent("install_confirmed");
+    const accepted = await trackEvent("install_confirmed", installToken);
     if (accepted) {
       try {
         localStorage.setItem(key, "1");
         localStorage.removeItem(pendingKey);
       } catch (_) {
-        // The database-side deduplication remains the source of truth.
+        // The database deduplicates this installation token.
       }
     } else {
       installationConfirmationPromise = null;
@@ -166,6 +187,8 @@ installButton.addEventListener("click", async () => {
 
 window.addEventListener("beforeinstallprompt", (event) => {
   event.preventDefault();
+  // A new installable browser session gets its own installation identifier.
+  prepareInstallationConfirmation();
   deferredInstallPrompt = event;
   installButtonLabel.textContent = "INSTALAR APLICATIVO";
 });
@@ -173,6 +196,9 @@ window.addEventListener("beforeinstallprompt", (event) => {
 window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
   markAsInstalled();
+  // Preserve the token created by beforeinstallprompt; create one if the
+  // browser installed from its own menu without exposing that event.
+  prepareInstallationConfirmation();
   void confirmInstallationOnce();
 });
 
