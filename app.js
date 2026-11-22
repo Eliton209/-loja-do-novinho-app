@@ -4,7 +4,7 @@ const installButtonLabel = document.querySelector("#install-button-label");
 const installHelp = document.querySelector("#install-help");
 const installHelpText = document.querySelector("#install-help-text");
 
-const METRICS_ENDPOINT = "https://cwnkpbwnexzulutpnnoq.supabase.co/functions/v1/store-event";
+const METRICS_ENDPOINT = "https://cwnkpbwnexzulutpnnoq.supabase.co/functions/v1/store-event-tracking-v2";
 
 function deviceToken() {
   let token = localStorage.getItem("ldn_metrics_device");
@@ -30,7 +30,9 @@ async function trackEvent(eventType) {
       body,
       keepalive: true
     });
-    return response.ok;
+    if (!response.ok) return false;
+    const result = await response.json().catch(() => null);
+    return result?.accepted === true;
   } catch (_) {
     // Metrics must never interrupt app navigation or installation.
     return false;
@@ -57,16 +59,19 @@ function confirmInstallationOnce() {
 
   installationConfirmationPromise = (async () => {
     const key = "ldn_install_confirmed_v1";
+    const pendingKey = "ldn_install_confirmation_pending_v1";
     try {
       if (localStorage.getItem(key) === "1") return;
+      localStorage.setItem(pendingKey, "1");
     } catch (_) {
-      // The server also deduplicates installation confirmations by device.
+      // The database also deduplicates confirmations by device.
     }
 
     const accepted = await trackEvent("install_confirmed");
     if (accepted) {
       try {
         localStorage.setItem(key, "1");
+        localStorage.removeItem(pendingKey);
       } catch (_) {
         // The database-side deduplication remains the source of truth.
       }
@@ -171,8 +176,27 @@ window.addEventListener("appinstalled", () => {
   void confirmInstallationOnce();
 });
 
-window.addEventListener("online", updateConnectionMessage);
+function retryPendingInstallationConfirmation() {
+  if (!isStandalone) return;
+  try {
+    if (localStorage.getItem("ldn_install_confirmation_pending_v1") === "1" &&
+        localStorage.getItem("ldn_install_confirmed_v1") !== "1") {
+      void confirmInstallationOnce();
+    }
+  } catch (_) {
+    // Storage may be unavailable in restricted browser contexts.
+  }
+}
+
+window.addEventListener("online", () => {
+  updateConnectionMessage();
+  retryPendingInstallationConfirmation();
+});
 window.addEventListener("offline", updateConnectionMessage);
+window.addEventListener("pageshow", retryPendingInstallationConfirmation);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") retryPendingInstallationConfirmation();
+});
 updateConnectionMessage();
 
 document.querySelector(".store-button")?.addEventListener("click", () => {
