@@ -131,9 +131,10 @@ function activateProductMarquee(grid, controlsId) {
 }
 
 function renderProducts() {
-  const grid = document.querySelector("#product-grid");
+  const categoryMode = Boolean(activeCategory);
+  const grid = document.querySelector(categoryMode ? "#category-product-grid" : "#product-grid");
   const section = document.querySelector("#vitrine");
-  const count = document.querySelector("#result-count");
+  const count = document.querySelector(categoryMode ? "#category-result-count" : "#result-count");
   if (!grid || !section || !count) return;
 
   const visible = products.filter(product => {
@@ -142,8 +143,12 @@ function renderProducts() {
     return inCategory && inSearch;
   });
 
-  section.hidden = !activeCategory && !activeSearch;
-  productsTitle.textContent = activeCategory || (activeSearch ? "Resultados da busca" : "Vitrine");
+  const categoryView = document.querySelector("#category-view");
+  categoryView.hidden = !categoryMode;
+  document.body.classList.toggle("category-open", categoryMode);
+  section.hidden = categoryMode || !activeSearch;
+  if (categoryMode) document.querySelector("#category-products-title").textContent = activeCategory;
+  else productsTitle.textContent = activeSearch ? "Resultados da busca" : "Vitrine";
   count.textContent = catalogReady
     ? visible.length + " produto(s)"
     : "Carregando catálogo…";
@@ -223,7 +228,7 @@ function renderProducts() {
     card.append(body);
     grid.append(card);
   }
-  activateProductMarquee(grid, "product-controls");
+  activateProductMarquee(grid, categoryMode ? "category-product-controls" : "product-controls");
 }
 
 
@@ -299,15 +304,18 @@ function renderCuradoria() {
 }
 
 function setActiveCategory(category) {
-  activeCategory = activeCategory === category ? "" : category;
+  activeCategory = category;
+  activeSearch = "";
   categoryList.querySelectorAll("button").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
   });
   renderProducts();
-  if (activeCategory) {
-    document.querySelector("#vitrine").scrollIntoView({ behavior: "smooth", block: "start" });
-  }
 }
+
+document.querySelector("#back-to-categories").addEventListener("click", () => {
+  activeCategory = "";
+  renderProducts();
+});
 
 searchForm.addEventListener("submit", event => {
   event.preventDefault();
