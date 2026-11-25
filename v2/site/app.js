@@ -331,10 +331,11 @@ function closeCategoryView() {
   categoryList.querySelectorAll("button").forEach(button => {
     button.setAttribute("aria-pressed", "false");
   });
-  document.body.classList.add("returned-to-categories");
+  document.body.classList.remove("category-open", "returned-to-categories");
   renderProducts();
+  // Retorna direto ao título e aos nichos, sem animar a passagem pelo banner.
   requestAnimationFrame(() => {
-    document.querySelector("#categorias").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector("#categories-title").scrollIntoView({ behavior: "instant", block: "start" });
   });
 }
 
