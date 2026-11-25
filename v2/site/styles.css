@@ -248,3 +248,88 @@ a { color: inherit; text-decoration: none; }
   .search button { padding: 0 16px; }
   .category-card { flex-direction: column; text-align: center; }
 }
+
+
+/* V2: reprodução dos cartões e ícones originais da vitrine Wix */
+.category-card {
+  min-height: 148px;
+  padding: 22px 24px 22px 94px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  gap: 16px;
+  border: 1px solid #dce5f0;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #fff 0%, #f5f8fd 55%, #e8f0fa 100%);
+  box-shadow: 0 6px 0 #dce5f0, 0 13px 26px #102b5014;
+}
+.category-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, #f2d58f, #c18c32);
+}
+.category-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 132px;
+  height: 132px;
+  right: -48px;
+  top: -54px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f2d58f55 0%, #d8ad581c 48%, transparent 72%);
+  pointer-events: none;
+}
+.category-card:hover,
+.category-card:focus-visible {
+  transform: translateY(-5px);
+  border-color: #c9a45d;
+  box-shadow: 0 9px 0 #d9c69e, 0 20px 32px #102b5020;
+  outline: none;
+}
+.category-card[aria-pressed="true"] {
+  border-color: #d7ae52;
+  background: #fff7df;
+}
+.category-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  transform: translateY(-50%) rotate(-5deg);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #fff, #e4edf8);
+  box-shadow: 0 8px 16px #102b5025, inset 0 1px 0 #fff;
+  font-size: 32px;
+}
+.category-text { display: block; min-width: 0; }
+.category-name {
+  display: block;
+  color: #102b50;
+  font-size: clamp(16px, 2.5vw, 20px);
+  line-height: 1.25;
+  font-weight: 800;
+}
+.category-description {
+  display: block;
+  margin-top: 5px;
+  color: #60738c;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 400;
+}
+@media (max-width: 520px) {
+  .category-card { min-height: 148px; padding: 20px 14px 20px 82px; }
+  .category-icon { left: 14px; width: 54px; height: 54px; }
+}
+@media (max-width: 370px) {
+  .category-card { flex-direction: row; text-align: left; }
+}
