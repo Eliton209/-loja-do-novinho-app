@@ -21,6 +21,10 @@ const installButton = document.querySelector("#install-app");
 
 let activeCategory = "";
 let deferredInstallPrompt = null;
+let products = [];
+let catalogReady = false;
+let activeSearch = "";
+
 
 function setActiveCategory(category) {
   activeCategory = activeCategory === category ? "" : category;
@@ -64,15 +68,168 @@ function renderCategories() {
   });
 }
 
-searchForm.addEventListener("submit", (event) => {
+function normalize(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function categoryMatches(product, category) {
+  return normalize(product.category) === normalize(category);
+}
+
+function productMatchesSearch(product, term) {
+  const haystack = normalize([
+    product.title,
+    product.description,
+    product.category,
+    product.platform
+  ].join(" "));
+  return haystack.includes(normalize(term));
+}
+
+function safeHttpsUrl(value) {
+  try {
+    const url = new URL(String(value ?? ""));
+    return url.protocol === "https:" ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
+function formatPrice(value) {
+  if (value === undefined || value === null || String(value).trim() === "") return "";
+  const raw = String(value).trim();
+  if (/^R\\$/i.test(raw)) return raw;
+  const numeric = Number(raw.replace(/[^0-9,.-]/g, "").replace(/\\./g, "").replace(",", "."));
+  return Number.isFinite(numeric) && numeric > 0
+    ? numeric.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+    : raw;
+}
+
+function renderProducts() {
+  const grid = document.querySelector("#product-grid");
+  const section = document.querySelector("#vitrine");
+  const count = document.querySelector("#result-count");
+  if (!grid || !section || !count) return;
+
+  const visible = products.filter(product => {
+    const inCategory = !activeCategory || categoryMatches(product, activeCategory);
+    const inSearch = !activeSearch || productMatchesSearch(product, activeSearch);
+    return inCategory && inSearch;
+  });
+
+  section.hidden = !activeCategory && !activeSearch;
+  productsTitle.textContent = activeCategory || (activeSearch ? "Resultados da busca" : "Vitrine");
+  count.textContent = catalogReady
+    ? visible.length + " produto(s)"
+    : "Carregando catálogo…";
+  grid.replaceChildren();
+
+  if (!catalogReady) {
+    const state = document.createElement("div");
+    state.className = "catalog-state";
+    state.textContent = "Conectando ao catálogo publicado da Loja do Novinho…";
+    grid.append(state);
+    return;
+  }
+
+  if (!visible.length) {
+    const empty = document.createElement("div");
+    empty.className = "catalog-state";
+    empty.textContent = "Nenhum produto encontrado nesta categoria ou busca.";
+    grid.append(empty);
+    return;
+  }
+
+  for (const product of visible) {
+    const card = document.createElement("article");
+    card.className = "product-card";
+
+    const imageUrl = safeHttpsUrl(product.imageUrl);
+    if (imageUrl) {
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = String(product.title || "Produto da Loja do Novinho");
+      image.loading = "lazy";
+      image.decoding = "async";
+      card.append(image);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "product-placeholder";
+      placeholder.textContent = "🛍️";
+      card.append(placeholder);
+    }
+
+    const body = document.createElement("div");
+    body.className = "product-body";
+
+    const platform = document.createElement("span");
+    platform.className = "platform";
+    platform.textContent = String(product.platform || "Loja parceira");
+
+    const title = document.createElement("h3");
+    title.textContent = String(product.title || "Produto");
+
+    body.append(platform, title);
+
+    const price = formatPrice(product.price);
+    if (price) {
+      const priceElement = document.createElement("p");
+      priceElement.className = "price";
+      priceElement.textContent = price;
+      body.append(priceElement);
+    }
+
+    const description = document.createElement("p");
+    description.className = "desc";
+    description.textContent = String(product.description || "Confira detalhes e disponibilidade na loja parceira.");
+    body.append(description);
+
+    const affiliateUrl = safeHttpsUrl(product.affiliateUrl);
+    if (affiliateUrl) {
+      const link = document.createElement("a");
+      link.className = "buy";
+      link.href = affiliateUrl;
+      link.target = "_blank";
+      link.rel = "sponsored nofollow noopener";
+      link.textContent = "Ver oferta";
+      body.append(link);
+    }
+
+    card.append(body);
+    grid.append(card);
+  }
+}
+
+function setActiveCategory(category) {
+  activeCategory = activeCategory === category ? "" : category;
+  categoryList.querySelectorAll("button").forEach(button => {
+    button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
+  });
+  renderProducts();
+  if (activeCategory) {
+    document.querySelector("#vitrine").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+searchForm.addEventListener("submit", event => {
   event.preventDefault();
-  const term = searchInput.value.trim();
-  resultCount.textContent = term ? "A busca será aplicada quando o catálogo estiver conectado." : "";
-  if (term) document.querySelector("#vitrine").scrollIntoView({ behavior: "smooth", block: "start" });
+  activeSearch = searchInput.value.trim();
+  renderProducts();
+  if (activeSearch) {
+    document.querySelector("#vitrine").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 });
 
 searchInput.addEventListener("input", () => {
-  if (!searchInput.value.trim()) resultCount.textContent = "";
+  if (!searchInput.value.trim()) {
+    activeSearch = "";
+    renderProducts();
+  }
 });
 
 window.addEventListener("beforeinstallprompt", (event) => {
@@ -91,3 +248,21 @@ installButton.addEventListener("click", async () => {
 });
 
 renderCategories();
+renderProducts();
+
+import("./catalog.js")
+  .then(({ loadPublishedProducts }) => loadPublishedProducts())
+  .then(items => {
+    products = items;
+    catalogReady = true;
+    renderProducts();
+  })
+  .catch(error => {
+    catalogReady = true;
+    const grid = document.querySelector("#product-grid");
+    const state = document.createElement("div");
+    state.className = "catalog-state";
+    state.textContent = "Não foi possível carregar o catálogo agora. Tente novamente mais tarde.";
+    grid.replaceChildren(state);
+    console.error("Falha na leitura do catálogo Wix:", error);
+  });
