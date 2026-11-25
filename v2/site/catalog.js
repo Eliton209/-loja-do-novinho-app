@@ -77,10 +77,10 @@ async function getVisitorToken() {
 }
 
 async function queryPage(offset, accessToken) {
-  const response = await fetch(API_BASE + "/wix-data/v2/items/query", {
+  const response = await fetch(API_BASE + "/data/v2/items/query", {
     method: "POST",
     headers: {
-      Authorization: accessToken,
+      Authorization: "Bearer " + accessToken,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
