@@ -33,11 +33,21 @@
     </section>
 
     <section class="section categories-section" id="categorias" aria-labelledby="categories-title">
-      <div class="section-heading">
+      <div class="section-heading" id="categories-heading">
         <h2 id="categories-title">Explore por categoria</h2>
         <p>Variedade para facilitar sua busca.</p>
       </div>
       <div class="category-grid" id="category-list" aria-label="Escolha uma categoria"></div>
+      <div class="niche-view" id="niche-view" hidden>
+        <div class="niche-heading">
+          <button class="back-categories" id="back-to-categories" type="button">← Todas as categorias</button>
+          <div class="niche-title-row">
+            <h2 id="niche-title"></h2>
+            <span class="result-count" id="niche-result-count" aria-live="polite"></span>
+          </div>
+        </div>
+        <div class="product-grid" id="niche-product-grid"></div>
+      </div>
     </section>
 
     <section class="section products-section" id="vitrine" aria-labelledby="products-title">
