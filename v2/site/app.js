@@ -96,6 +96,25 @@ function safeHttpsUrl(value) {
   }
 }
 
+function makeProductCardClickable(card, affiliateUrl) {
+  if (!affiliateUrl) return;
+  card.classList.add("product-card-clickable");
+  card.setAttribute("role", "link");
+  card.setAttribute("tabindex", "0");
+  card.setAttribute("aria-label", "Abrir oferta: " + String(card.querySelector("h3")?.textContent || "produto"));
+  const openOffer = () => window.open(affiliateUrl, "_blank", "noopener,noreferrer");
+  card.addEventListener("click", event => {
+    // O botão "Ver oferta" já é um link real; evita abrir duas abas.
+    if (event.target.closest("a, button")) return;
+    openOffer();
+  });
+  card.addEventListener("keydown", event => {
+    if (event.target !== card || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    openOffer();
+  });
+}
+
 function formatPrice(value) {
   if (value === undefined || value === null || String(value).trim() === "") return "";
   const raw = String(value).trim();
@@ -215,6 +234,7 @@ function renderProducts() {
     body.append(description);
 
     const affiliateUrl = safeHttpsUrl(product.affiliateUrl);
+    makeProductCardClickable(card, affiliateUrl);
     if (affiliateUrl) {
       const link = document.createElement("a");
       link.className = "buy";
@@ -288,6 +308,7 @@ function renderCuradoria() {
     body.append(description);
 
     const affiliateUrl = safeHttpsUrl(product.affiliateUrl);
+    makeProductCardClickable(card, affiliateUrl);
     if (affiliateUrl) {
       const link = document.createElement("a");
       link.className = "buy";
