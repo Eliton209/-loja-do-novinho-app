@@ -21,7 +21,7 @@ Captura da vitrine Wix em celular enviada em 25/11/2026. A composição visível
 - Busca e categorias ainda não operam sobre produtos reais.
 
 ## Pendências importantes
-- **Banner:** a imagem principal original da Wix ainda não foi obtida. O bloco atual é apenas um placeholder visual e não deve ser confundido com a arte real.
+- **Banner:** conectado à imagem original “Banner Loja do Novinho - personagem masculino 3D.jpg”, localizada por busca somente-leitura na biblioteca de mídia Wix. A V2 carrega a imagem por URL pública estática; nenhum arquivo ou configuração foi alterado na Wix.
 - **Ícones/categorias:** os ícones atuais são provisórios; devem ser comparados com os cartões completos da Wix.
 - **Produtos:** não há cards reais conectados.
 - **Busca/filtros:** aguardam integração com catálogo.
