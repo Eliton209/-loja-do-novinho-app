@@ -7,9 +7,9 @@ Este arquivo identifica a referência aprovada pelo usuário para continuar o pr
 - Repositório: `Eliton209/-loja-do-novinho-app`
 - Branch aprovada: `v2-curadoria-marketplaces`
 - Commit-base inicial aprovado: `5c3f1248df007dc5865fcae9b41a117322b493ad`
-- **Última versão aprovada pelo usuário:** `1cb98f871ae9455d5d37ad403664369527e75f70`
-- Preview correspondente: https://loja-do-novinho-v2-preview-f8fbmv0n5-pereiraeliton811-1123.vercel.app
-- Implantação Vercel: `dpl_8FMDJ8LjjVuHdd6YM1C96A8N9mvF` (READY)
+- **Última versão aprovada pelo usuário:** `0381d986f7adc8dcb351bf139e426d7893591cce`
+- Preview correspondente: https://loja-do-novinho-v2-preview-42vxzeq9w-pereiraeliton811-1123.vercel.app
+- Implantação Vercel: `dpl_6W3nym9CXDvG6QyEs9Nbi3hJgXac` (READY)
 
 ## Configurações aprovadas nesta versão
 
@@ -17,7 +17,9 @@ Este arquivo identifica a referência aprovada pelo usuário para continuar o pr
 - O botão "Ver oferta" continua funcionando e não provoca abertura duplicada.
 - A busca identifica o nicho correspondente e abre a visualização própria desse nicho.
 - Na busca, exibe somente os produtos correspondentes dentro do nicho; não mostra uma segunda lista de resultados na parte inferior da vitrine.
-- Ao voltar, fecha a visualização do nicho, limpa o termo de busca e retorna à vitrine/categorias. O botão voltar do aparelho também fecha o nicho.
+- Ao voltar, fecha a visualização do nicho, limpa o termo de busca e retorna diretamente à área dos nichos, sem exibir o banner no percurso.
+- O retorno direto aos nichos não bloqueia a navegação normal: o cliente pode continuar rolando a página para cima e para baixo e acessar as demais seções da loja.
+- O botão de voltar do nicho e o botão voltar do aparelho fecham a visualização do nicho.
 - Aprovado pelo usuário em 25/11/2026.
 
 A versão aprovada mais recente acima passa a ser o ponto de partida para as próximas alterações. O commit-base inicial permanece registrado como histórico.
