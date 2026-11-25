@@ -100,11 +100,33 @@ function formatPrice(value) {
     : raw;
 }
 
-function activateProductMarquee(grid) {
+function setupProductAdvance(grid, controlsId, itemCount) {
+  const controls = document.querySelector("#" + controlsId);
+  if (!controls) return;
+  controls.hidden = itemCount < 2;
+  controls.querySelectorAll("button").forEach(button => {
+    button.onclick = () => {
+      const animation = grid.getAnimations().find(item => item.effect);
+      if (animation) {
+        const duration = Number(animation.effect.getTiming().duration) || 30000;
+        const step = duration / Math.max(1, itemCount);
+        const direction = button.dataset.direction === "previous" ? -1 : 1;
+        animation.pause();
+        animation.currentTime = Math.max(0, Number(animation.currentTime || 0) + direction * step);
+        animation.play();
+      } else {
+        const card = grid.querySelector(".product-card");
+        if (card) grid.scrollBy({ left: (card.getBoundingClientRect().width + 18) * (button.dataset.direction === "previous" ? -1 : 1), behavior: "smooth" });
+      }
+    };
+  });
+}
+
+function activateProductMarquee(grid, controlsId) {
   const originals = Array.from(grid.children);
   grid.classList.remove("product-marquee");
   grid.style.removeProperty("--marquee-duration");
-  if (originals.length < 2) return;
+  setupProductAdvance(grid, controlsId, originals.length);\n  if (originals.length < 2) return;
 
   // Duplica a sequência para o movimento contínuo, sem alterar os dados do catálogo.
   originals.forEach(card => {
@@ -213,7 +235,7 @@ function renderProducts() {
     card.append(body);
     grid.append(card);
   }
-  activateProductMarquee(grid);
+  activateProductMarquee(grid, "product-controls");
 }
 
 
@@ -228,7 +250,7 @@ function renderCuradoria() {
   if (!section || !grid) return;
 
   const featured = products.filter(isMercadoLivre);
-  section.hidden = !catalogReady || featured.length === 0;
+  section.hidden = !catalogReady || featured.length === 0 || Boolean(activeCategory || activeSearch);
   grid.replaceChildren();
   if (!catalogReady || !featured.length) return;
 
@@ -285,7 +307,7 @@ function renderCuradoria() {
     card.append(body);
     grid.append(card);
   }
-  activateProductMarquee(grid);
+  activateProductMarquee(grid, "curated-controls");
 }
 
 function setActiveCategory(category) {
