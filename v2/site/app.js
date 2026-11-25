@@ -68,7 +68,13 @@ function normalize(value) {
 }
 
 function categoryMatches(product, category) {
-  return normalize(product.category) === normalize(category);
+  const productCategory = normalize(product.category);
+  const selectedCategory = normalize(category);
+  if (!productCategory || !selectedCategory) return false;
+  // Aceita o nome do nicho e suas variações de cadastro, sem misturar categorias distintas.
+  return productCategory === selectedCategory ||
+    productCategory.startsWith(selectedCategory + " ") ||
+    selectedCategory.startsWith(productCategory + " ");
 }
 
 function productMatchesSearch(product, term) {
@@ -106,41 +112,22 @@ function setupProductAdvance(grid, controlsId, itemCount) {
   controls.hidden = itemCount < 2;
   controls.querySelectorAll("button").forEach(button => {
     button.onclick = () => {
-      const animation = grid.getAnimations().find(item => item.effect);
-      if (animation) {
-        const duration = Number(animation.effect.getTiming().duration) || 30000;
-        const step = duration / Math.max(1, itemCount);
-        const direction = button.dataset.direction === "previous" ? -1 : 1;
-        animation.pause();
-        animation.currentTime = Math.max(0, Number(animation.currentTime || 0) + direction * step);
-        animation.play();
-      } else {
-        const card = grid.querySelector(".product-card");
-        if (card) grid.scrollBy({ left: (card.getBoundingClientRect().width + 18) * (button.dataset.direction === "previous" ? -1 : 1), behavior: "smooth" });
-      }
+      const card = grid.querySelector(".product-card");
+      if (!card) return;
+      const direction = button.dataset.direction === "previous" ? -1 : 1;
+      grid.scrollBy({
+        left: (card.getBoundingClientRect().width + 18) * direction,
+        behavior: "smooth"
+      });
     };
   });
 }
 
+// Produtos ficam parados; o cliente navega manualmente pelo deslize ou pelos botões.
 function activateProductMarquee(grid, controlsId) {
-  const originals = Array.from(grid.children);
   grid.classList.remove("product-marquee");
   grid.style.removeProperty("--marquee-duration");
-  setupProductAdvance(grid, controlsId, originals.length);
-  if (originals.length < 2) return;
-
-  // Duplica a sequência para o movimento contínuo, sem alterar os dados do catálogo.
-  originals.forEach(card => {
-    const clone = card.cloneNode(true);
-    clone.setAttribute("aria-hidden", "true");
-    clone.querySelectorAll("a, button").forEach(control => {
-      control.setAttribute("tabindex", "-1");
-    });
-    grid.append(clone);
-  });
-
-  grid.style.setProperty("--marquee-duration", `${Math.max(22, originals.length * 7)}s`);
-  grid.classList.add("product-marquee");
+  setupProductAdvance(grid, controlsId, grid.querySelectorAll(".product-card").length);
 }
 
 function renderProducts() {
