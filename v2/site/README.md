@@ -1,19 +1,37 @@
-# V2 — protótipo isolado da vitrine
+# V2 — reprodução progressiva da vitrine Loja do Novinho
 
-Esta pasta contém apenas o início da nova interface. Não substitui o PWA atual e não altera a Wix.
+Esta pasta contém a segunda versão isolada da vitrine. O trabalho ocorre somente na branch `v2-vitrine-seo`, dentro de `v2/`. Não substitui nem modifica o PWA original, o site Wix publicado, o CMS de afiliados ou as integrações Mercado Livre/Amazon.
 
-## Arquivos
-- `index.html`: estrutura semântica da página.
-- `styles.css`: primeira base visual responsiva azul e branca.
-- `app.js`: navegação inicial das categorias e preparação da busca.
+## Referência visual recebida
+Captura da vitrine Wix em celular enviada em 25/11/2026. A composição visível orienta a implementação:
+- Banner principal em largura total, com a arte/personagem da Loja do Novinho.
+- Painel de apresentação claro sobre fundo azul, com cantos inferiores arredondados.
+- Título centralizado: “Encontre seus próximos achadinhos!”
+- Subtítulo: “Ofertas e novidades para facilitar suas escolhas.”
+- Dois botões dourados largos: “Explorar categorias” e “↓ INSTALE O APLICATIVO”.
+- Busca em caixa branca arredondada, lupa à esquerda e botão azul-escuro “Buscar”.
+- Separador horizontal e seção “Explore por categoria”, com subtítulo “Variedade para facilitar sua busca.”
+- Cartões de categoria em duas colunas no celular, com borda/detalhe dourado, fundo claro, ícone e nome.
 
-## Situação
-- A estrutura inicial foi criada usando a identidade e os textos já conhecidos da Loja do Novinho.
-- As nove categorias foram copiadas da fotografia do catálogo obtida por consulta somente-leitura em 25/11/2026.
-- A grade de produtos ainda não carrega itens reais.
-- Busca e filtros ainda não consultam dados reais.
-- Nenhuma credencial Wix foi colocada no frontend.
-- Nenhum deploy, domínio, PWA publicado, CMS, integração de afiliados ou site Wix foi alterado.
+## Implementado nesta etapa
+- Reorganização do HTML para refletir a sequência visual da captura.
+- Estilos responsivos iniciais para banner, painel, botões dourados, busca, separador e cartões em duas colunas.
+- Categorias em cartões clicáveis com ícones ilustrativos.
+- Botão de instalação com tratamento do evento `beforeinstallprompt` e orientação alternativa quando o navegador não oferece prompt.
+- Busca e categorias ainda não operam sobre produtos reais.
 
-## Antes de chamar esta interface de cópia fiel
-É necessário comparar as telas reais da Wix em celular e desktop (cabeçalho, espaçamentos, cartões, filtros, busca, paginação e detalhes do produto) e ajustar esta base. A referência Wix permanece a fonte visual obrigatória.
+## Pendências importantes
+- **Banner:** a imagem principal original da Wix ainda não foi obtida. O bloco atual é apenas um placeholder visual e não deve ser confundido com a arte real.
+- **Ícones/categorias:** os ícones atuais são provisórios; devem ser comparados com os cartões completos da Wix.
+- **Produtos:** não há cards reais conectados.
+- **Busca/filtros:** aguardam integração com catálogo.
+- **Comparação:** ainda falta captura da página mais abaixo (cards de produto) e, idealmente, uma captura em desktop para validar as demais larguras.
+- **Integração Wix:** antes de consultar a coleção publicamente, validar autenticação segura somente-leitura. Não colocar token administrativo ou segredo no frontend.
+
+## Regras de preservação
+- Não editar arquivos na raiz do repositório nem a branch principal.
+- Não publicar a V2 nem conectar domínio de produção sem autorização explícita.
+- Não alterar Wix, CMS, PWA original, service worker original, integrações de afiliados ou configuração de produção.
+- Trabalhar somente em `v2/` na branch `v2-vitrine-seo`.
+
+A V2 ainda é uma implementação parcial; não declarar cópia fiel concluída até comparar a página inteira e validar os dados e comportamentos reais.
