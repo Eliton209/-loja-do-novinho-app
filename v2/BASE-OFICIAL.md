@@ -6,8 +6,18 @@ Este arquivo identifica a referência aprovada pelo usuário para continuar o pr
 
 - Repositório: `Eliton209/-loja-do-novinho-app`
 - Branch aprovada: `v2-curadoria-marketplaces`
-- Commit aprovado: `5c3f1248df007dc5865fcae9b41a117322b493ad`
-- Página de preview confirmada pelo usuário: https://loja-do-novinho-v2-preview-xk4msqy7f-pereiraeliton811-1123.vercel.app
+- Commit-base inicial aprovado: `5c3f1248df007dc5865fcae9b41a117322b493ad`
+- **Última versão aprovada pelo usuário:** `7364e110bff6fbfc274166114768880ddae063b1`
+- Preview correspondente: https://loja-do-novinho-v2-preview-86ub0q589-pereiraeliton811-1123.vercel.app
+- Implantação Vercel: `dpl_F1po6AnaCi8nFwJnwZh8f9N5AWub` (READY)
+
+## Configurações aprovadas nesta versão
+
+- Cartão inteiro do produto clicável: imagem, título, descrição, preço e área restante abrem o link de afiliado diretamente.
+- O botão "Ver oferta" continua funcionando e não provoca abertura duplicada.
+- Aprovado pelo usuário em 25/11/2026.
+
+A versão aprovada mais recente acima passa a ser o ponto de partida para as próximas alterações. O commit-base inicial permanece registrado como histórico.
 
 ## Regras obrigatórias para continuar
 
