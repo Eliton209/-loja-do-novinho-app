@@ -9,7 +9,11 @@ const categories = [
   { name: "Acessórios", icon: "⌚", subtitle: "Itens para todos os estilos" },
   { name: "Moda", icon: "👕", subtitle: "Estilo e novidades" },
   { name: "Ofertas", icon: "🏷️", subtitle: "Achadinhos e oportunidades" },
-  { name: "Brinquedos e Diversão", icon: "🧸", subtitle: "Brincadeiras para todas as idades" }
+  { name: "Brinquedos e Diversão", icon: "🧸", subtitle: "Brincadeiras para todas as idades" },
+  { name: "Loja do Novinho na Shopee", icon: "🛍️", subtitle: "Achadinhos da Shopee", platform: "Shopee" },
+  { name: "Loja do Novinho no Magalu", icon: "💙", subtitle: "Ofertas do Magalu", platform: "Magalu" },
+  { name: "Mercado Livre", icon: "📦", subtitle: "Produtos do Mercado Livre", platform: "Mercado Livre" },
+  { name: "Loja do Novinho na Amazon", icon: "📦", subtitle: "Ofertas da Amazon", platform: "Amazon" }
 ];
 
 const categoryList = document.querySelector("#category-list");
@@ -68,6 +72,10 @@ function normalize(value) {
 }
 
 function categoryMatches(product, category) {
+  const selected = categories.find(item => item.name === category);
+  if (selected?.platform) {
+    return normalize(product.platform).includes(normalize(selected.platform));
+  }
   return normalize(product.category) === normalize(category);
 }
 
