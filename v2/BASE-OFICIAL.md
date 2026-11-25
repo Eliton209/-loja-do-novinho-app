@@ -7,14 +7,17 @@ Este arquivo identifica a referência aprovada pelo usuário para continuar o pr
 - Repositório: `Eliton209/-loja-do-novinho-app`
 - Branch aprovada: `v2-curadoria-marketplaces`
 - Commit-base inicial aprovado: `5c3f1248df007dc5865fcae9b41a117322b493ad`
-- **Última versão aprovada pelo usuário:** `7364e110bff6fbfc274166114768880ddae063b1`
-- Preview correspondente: https://loja-do-novinho-v2-preview-86ub0q589-pereiraeliton811-1123.vercel.app
-- Implantação Vercel: `dpl_F1po6AnaCi8nFwJnwZh8f9N5AWub` (READY)
+- **Última versão aprovada pelo usuário:** `1cb98f871ae9455d5d37ad403664369527e75f70`
+- Preview correspondente: https://loja-do-novinho-v2-preview-f8fbmv0n5-pereiraeliton811-1123.vercel.app
+- Implantação Vercel: `dpl_8FMDJ8LjjVuHdd6YM1C96A8N9mvF` (READY)
 
 ## Configurações aprovadas nesta versão
 
 - Cartão inteiro do produto clicável: imagem, título, descrição, preço e área restante abrem o link de afiliado diretamente.
 - O botão "Ver oferta" continua funcionando e não provoca abertura duplicada.
+- A busca identifica o nicho correspondente e abre a visualização própria desse nicho.
+- Na busca, exibe somente os produtos correspondentes dentro do nicho; não mostra uma segunda lista de resultados na parte inferior da vitrine.
+- Ao voltar, fecha a visualização do nicho, limpa o termo de busca e retorna à vitrine/categorias. O botão voltar do aparelho também fecha o nicho.
 - Aprovado pelo usuário em 25/11/2026.
 
 A versão aprovada mais recente acima passa a ser o ponto de partida para as próximas alterações. O commit-base inicial permanece registrado como histórico.
