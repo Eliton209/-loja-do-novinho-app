@@ -117,6 +117,20 @@
       <h2>Como funciona</h2>
       <p>Você escolhe um produto e segue para a loja parceira para conferir os detalhes, a disponibilidade e finalizar sua compra.</p>
     </section>
+
+    <section class="section category-view" id="category-view" aria-labelledby="category-products-title" hidden>
+      <button class="category-back" id="back-to-categories" type="button">‹ Voltar aos nichos</button>
+      <div class="section-heading products-heading">
+        <h2 id="category-products-title">Produtos do nicho</h2>
+        <span class="result-count" id="category-result-count" aria-live="polite"></span>
+      </div>
+      <div class="product-controls" id="category-product-controls" aria-label="Navegação dos produtos deste nicho">
+        <button type="button" class="product-advance" data-direction="previous" aria-label="Voltar um produto">‹</button>
+        <button type="button" class="product-advance" data-direction="next">Avançar produtos ›</button>
+      </div>
+      <div class="product-grid" id="category-product-grid"></div>
+    </section>
+
   </main>
 
   <footer class="site-footer" id="contato">
