@@ -324,10 +324,32 @@ function renderCuradoria() {
   activateProductMarquee(grid, "curated-controls");
 }
 
+function closeCategoryView() {
+  activeCategory = "";
+  activeSearch = "";
+  searchInput.value = "";
+  categoryList.querySelectorAll("button").forEach(button => {
+    button.setAttribute("aria-pressed", "false");
+  });
+  document.body.classList.add("returned-to-categories");
+  renderProducts();
+  requestAnimationFrame(() => {
+    document.querySelector("#categorias").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+function registerCategoryHistory() {
+  if (!history.state?.ldnCategoryOpen) {
+    history.pushState({ ldnCategoryOpen: true }, "", "#nicho");
+  }
+}
+
 function setActiveCategory(category) {
+  registerCategoryHistory();
   document.body.classList.remove("returned-to-categories");
   activeCategory = category;
   activeSearch = "";
+  searchInput.value = "";
   categoryList.querySelectorAll("button").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
   });
@@ -335,12 +357,15 @@ function setActiveCategory(category) {
 }
 
 document.querySelector("#back-to-categories").addEventListener("click", () => {
-  activeCategory = "";
-  document.body.classList.add("returned-to-categories");
-  renderProducts();
-  requestAnimationFrame(() => {
-    document.querySelector("#categorias").scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+  if (history.state?.ldnCategoryOpen) {
+    history.back();
+    return;
+  }
+  closeCategoryView();
+});
+
+window.addEventListener("popstate", () => {
+  if (activeCategory) closeCategoryView();
 });
 
 searchForm.addEventListener("submit", event => {
@@ -349,8 +374,7 @@ searchForm.addEventListener("submit", event => {
   activeCategory = "";
 
   if (activeSearch && catalogReady) {
-    // Descobre em qual nicho estão os resultados e abre esse nicho,
-    // mantendo o termo para exibir apenas os produtos correspondentes.
+    // A busca abre somente o nicho correspondente; não cria uma lista duplicada na vitrine.
     const matches = products.filter(product => productMatchesSearch(product, activeSearch));
     const categoryCounts = categories
       .map(category => ({
@@ -359,7 +383,10 @@ searchForm.addEventListener("submit", event => {
       }))
       .filter(item => item.count > 0)
       .sort((a, b) => b.count - a.count);
-    if (categoryCounts.length) activeCategory = categoryCounts[0].name;
+    if (categoryCounts.length) {
+      activeCategory = categoryCounts[0].name;
+      registerCategoryHistory();
+    }
   }
 
   categoryList.querySelectorAll("button").forEach(button => {
