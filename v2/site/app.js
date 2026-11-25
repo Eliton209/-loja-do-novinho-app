@@ -346,9 +346,32 @@ document.querySelector("#back-to-categories").addEventListener("click", () => {
 searchForm.addEventListener("submit", event => {
   event.preventDefault();
   activeSearch = searchInput.value.trim();
+  activeCategory = "";
+
+  if (activeSearch && catalogReady) {
+    // Descobre em qual nicho estão os resultados e abre esse nicho,
+    // mantendo o termo para exibir apenas os produtos correspondentes.
+    const matches = products.filter(product => productMatchesSearch(product, activeSearch));
+    const categoryCounts = categories
+      .map(category => ({
+        name: category.name,
+        count: matches.filter(product => categoryMatches(product, category.name)).length
+      }))
+      .filter(item => item.count > 0)
+      .sort((a, b) => b.count - a.count);
+    if (categoryCounts.length) activeCategory = categoryCounts[0].name;
+  }
+
+  categoryList.querySelectorAll("button").forEach(button => {
+    button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
+  });
   renderProducts();
+
   if (activeSearch) {
-    document.querySelector("#vitrine").scrollIntoView({ behavior: "smooth", block: "start" });
+    const destination = activeCategory
+      ? document.querySelector("#category-view")
+      : document.querySelector("#vitrine");
+    destination.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 });
 
