@@ -61,7 +61,7 @@ function renderCategories() {
 function normalize(value) {
   return String(value ?? "")
     .normalize("NFD")
-    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
@@ -93,8 +93,8 @@ function safeHttpsUrl(value) {
 function formatPrice(value) {
   if (value === undefined || value === null || String(value).trim() === "") return "";
   const raw = String(value).trim();
-  if (/^R\\$/i.test(raw)) return raw;
-  const numeric = Number(raw.replace(/[^0-9,.-]/g, "").replace(/\\./g, "").replace(",", "."));
+  if (/^R\$/i.test(raw)) return raw;
+  const numeric = Number(raw.replace(/[^0-9,.-]/g, "").replace(/\./g, "").replace(",", "."));
   return Number.isFinite(numeric) && numeric > 0
     ? numeric.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
     : raw;
