@@ -1,15 +1,15 @@
 // Loja do Novinho — V2 isolada.
 // Não consulta nem altera o CMS Wix. A conexão será feita após validar leitura pública segura.
 const categories = [
-  { name: "Eletrônicos", icon: "📱" },
-  { name: "Casa, móveis e decoração", icon: "🏠" },
-  { name: "Informática", icon: "💻" },
-  { name: "Cozinha", icon: "🍳" },
-  { name: "Cama, mesa e banho", icon: "🛏️" },
-  { name: "Acessórios", icon: "🎧" },
-  { name: "Brinquedos e Diversão", icon: "🧸" },
-  { name: "Moda", icon: "👕" },
-  { name: "Ofertas", icon: "🏷️" }
+  { name: "Eletrônicos", icon: "📱", subtitle: "Celulares e tecnologia" },
+  { name: "Casa, móveis e decoração", icon: "🏠", subtitle: "Conforto para seu espaço" },
+  { name: "Cama, mesa e banho", icon: "🛁", subtitle: "Cuidados e utilidades" },
+  { name: "Cozinha", icon: "🍳", subtitle: "Praticidade no dia a dia" },
+  { name: "Informática", icon: "💻", subtitle: "Tecnologia e produtividade" },
+  { name: "Acessórios", icon: "⌚", subtitle: "Itens para todos os estilos" },
+  { name: "Moda", icon: "👕", subtitle: "Estilo e novidades" },
+  { name: "Ofertas", icon: "🏷️", subtitle: "Achadinhos e oportunidades" },
+  { name: "Brinquedos e Diversão", icon: "🧸", subtitle: "Brincadeiras para todas as idades" }
 ];
 
 const categoryList = document.querySelector("#category-list");
@@ -34,7 +34,7 @@ function setActiveCategory(category) {
 
 function renderCategories() {
   categoryList.replaceChildren();
-  categories.forEach(({ name, icon }) => {
+  categories.forEach(({ name, icon, subtitle }) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "category-card";
@@ -46,10 +46,19 @@ function renderCategories() {
     iconElement.setAttribute("aria-hidden", "true");
     iconElement.textContent = icon;
 
+    const textGroup = document.createElement("span");
+    textGroup.className = "category-text";
+
     const label = document.createElement("span");
+    label.className = "category-name";
     label.textContent = name;
 
-    button.append(iconElement, label);
+    const description = document.createElement("small");
+    description.className = "category-description";
+    description.textContent = subtitle;
+
+    textGroup.append(label, description);
+    button.append(iconElement, textGroup);
     button.addEventListener("click", () => setActiveCategory(name));
     categoryList.append(button);
   });
