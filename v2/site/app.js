@@ -304,6 +304,7 @@ function renderCuradoria() {
 }
 
 function setActiveCategory(category) {
+  document.body.classList.remove("returned-to-categories");
   activeCategory = category;
   activeSearch = "";
   categoryList.querySelectorAll("button").forEach(button => {
@@ -314,7 +315,11 @@ function setActiveCategory(category) {
 
 document.querySelector("#back-to-categories").addEventListener("click", () => {
   activeCategory = "";
+  document.body.classList.add("returned-to-categories");
   renderProducts();
+  requestAnimationFrame(() => {
+    document.querySelector("#categorias").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 });
 
 searchForm.addEventListener("submit", event => {
