@@ -126,7 +126,8 @@ function activateProductMarquee(grid, controlsId) {
   const originals = Array.from(grid.children);
   grid.classList.remove("product-marquee");
   grid.style.removeProperty("--marquee-duration");
-  setupProductAdvance(grid, controlsId, originals.length);\n  if (originals.length < 2) return;
+  setupProductAdvance(grid, controlsId, originals.length);
+  if (originals.length < 2) return;
 
   // Duplica a sequência para o movimento contínuo, sem alterar os dados do catálogo.
   originals.forEach(card => {
