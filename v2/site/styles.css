@@ -403,3 +403,12 @@ a { color: inherit; text-decoration: none; }
 @media (min-width: 900px) {
   .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+
+/* V2: curadoria automática dos produtos publicados no Mercado Livre */
+.curated-section {
+  padding: 54px 0 72px;
+}
+.curated-section[hidden] { display: none !important; }
+.curated-section .section-heading { margin-bottom: 28px; }
+.curated-section .section-heading p { margin-top: 12px; }
