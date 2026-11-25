@@ -100,6 +100,26 @@ function formatPrice(value) {
     : raw;
 }
 
+function activateProductMarquee(grid) {
+  const originals = Array.from(grid.children);
+  grid.classList.remove("product-marquee");
+  grid.style.removeProperty("--marquee-duration");
+  if (originals.length < 2) return;
+
+  // Duplica a sequência para o movimento contínuo, sem alterar os dados do catálogo.
+  originals.forEach(card => {
+    const clone = card.cloneNode(true);
+    clone.setAttribute("aria-hidden", "true");
+    clone.querySelectorAll("a, button").forEach(control => {
+      control.setAttribute("tabindex", "-1");
+    });
+    grid.append(clone);
+  });
+
+  grid.style.setProperty("--marquee-duration", `${Math.max(22, originals.length * 7)}s`);
+  grid.classList.add("product-marquee");
+}
+
 function renderProducts() {
   const grid = document.querySelector("#product-grid");
   const section = document.querySelector("#vitrine");
@@ -193,6 +213,7 @@ function renderProducts() {
     card.append(body);
     grid.append(card);
   }
+  activateProductMarquee(grid);
 }
 
 
@@ -264,6 +285,7 @@ function renderCuradoria() {
     card.append(body);
     grid.append(card);
   }
+  activateProductMarquee(grid);
 }
 
 function setActiveCategory(category) {
