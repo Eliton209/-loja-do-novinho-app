@@ -250,7 +250,7 @@ function renderCuradoria() {
   if (!section || !grid) return;
 
   const featured = products.filter(isMercadoLivre);
-  section.hidden = !catalogReady || featured.length === 0 || Boolean(activeCategory || activeSearch);
+  section.hidden = !catalogReady || featured.length === 0;
   grid.replaceChildren();
   if (!catalogReady || !featured.length) return;
 
