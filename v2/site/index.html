@@ -3,76 +3,65 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#123f78">
-  <meta name="description" content="Encontre seus próximos achadinhos na Loja do Novinho.">
+  <meta name="theme-color" content="#164f9f">
+  <meta name="description" content="Ofertas e novidades para facilitar suas escolhas na Loja do Novinho.">
   <title>Loja do Novinho | Vitrine</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="./app.js" defer></script>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="./" aria-label="Loja do Novinho, página inicial">
-      <span class="brand-mark" aria-hidden="true">LN</span>
-      <span class="brand-name">LOJA DO NOVINHO</span>
-    </a>
-    <nav class="main-nav" aria-label="Navegação principal">
-      <a href="./" aria-current="page">Início</a>
-      <a href="#categorias">Categorias</a>
-      <a href="#vitrine">Vitrine</a>
-      <a href="#como-funciona">Como funciona</a>
-      <a href="#contato">Contato</a>
-    </nav>
-  </header>
-
   <main>
     <section class="hero" aria-labelledby="hero-title">
-      <p class="eyebrow">Praticidade • variedade • boas escolhas</p>
-      <h1 id="hero-title">Encontre seus próximos achadinhos.</h1>
-      <p class="hero-copy">Uma seleção de produtos para facilitar o seu dia a dia.</p>
+      <div class="hero-banner" role="img" aria-label="Banner principal da Loja do Novinho">
+        <!-- A imagem original do banner Wix deve ser conectada aqui quando o arquivo/URL original for identificado. -->
+        <span class="banner-brand">LOJA DO NOVINHO</span>
+      </div>
+      <div class="hero-panel">
+        <h1 id="hero-title">Encontre seus próximos<br class="desktop-break"> achadinhos!</h1>
+        <p class="hero-copy">Ofertas e novidades para facilitar suas escolhas.</p>
+        <a class="button button-gold" href="#categorias">Explorar categorias</a>
+        <button class="button button-gold button-install" id="install-app" type="button">↓ INSTALE O APLICATIVO</button>
+      </div>
+    </section>
+
+    <section class="search-area" aria-label="Buscar produtos">
       <form class="search" role="search" id="search-form">
         <label class="sr-only" for="search-input">Buscar produtos</label>
+        <span class="search-icon" aria-hidden="true">🔎</span>
         <input id="search-input" type="search" placeholder="O que você está procurando?" autocomplete="off">
         <button type="submit">Buscar</button>
       </form>
+      <div class="section-divider" aria-hidden="true"></div>
     </section>
 
-    <section class="section" id="categorias" aria-labelledby="categories-title">
+    <section class="section categories-section" id="categorias" aria-labelledby="categories-title">
       <div class="section-heading">
-        <div>
-          <p class="eyebrow">Explore a loja</p>
-          <h2 id="categories-title">Categorias</h2>
-        </div>
+        <h2 id="categories-title">Explore por categoria</h2>
+        <p>Variedade para facilitar sua busca.</p>
       </div>
-      <div class="category-list" id="category-list" aria-label="Filtrar por categoria"></div>
+      <div class="category-grid" id="category-list" aria-label="Escolha uma categoria"></div>
     </section>
 
     <section class="section products-section" id="vitrine" aria-labelledby="products-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Escolhas para você</p>
-          <h2 id="products-title">Vitrine</h2>
-        </div>
+      <div class="section-heading products-heading">
+        <h2 id="products-title">Vitrine</h2>
         <span class="result-count" id="result-count" aria-live="polite"></span>
       </div>
       <div class="product-grid" id="product-grid">
         <div class="catalog-state" role="status">
-          <span class="state-dot"></span>
-          <p>A estrutura da vitrine está preparada. A conexão segura com o catálogo Wix será adicionada após a validação do acesso público somente para leitura.</p>
+          <p>Os produtos serão exibidos aqui após a conexão segura e somente para leitura com o catálogo Wix.</p>
         </div>
       </div>
     </section>
 
     <section class="info-section" id="como-funciona">
-      <div class="info-icon" aria-hidden="true">✓</div>
-      <div>
-        <h2>Como funciona</h2>
-        <p>Você escolhe um produto e segue para a loja parceira, onde confere os detalhes, a disponibilidade e finaliza sua compra com segurança.</p>
-      </div>
+      <h2>Como funciona</h2>
+      <p>Você escolhe um produto e segue para a loja parceira para conferir os detalhes, a disponibilidade e finalizar sua compra.</p>
     </section>
   </main>
 
   <footer class="site-footer" id="contato">
-    <a class="footer-brand" href="./">LOJA DO NOVINHO</a>
+    <strong>LOJA DO NOVINHO</strong>
     <p>Ficou com alguma dúvida? Entre em contato pelo WhatsApp.</p>
     <small>As compras e entregas são realizadas diretamente pelas lojas parceiras.</small>
   </footer>
