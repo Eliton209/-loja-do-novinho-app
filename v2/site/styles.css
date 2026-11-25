@@ -601,10 +601,3 @@ body.category-open main { min-height: 100vh; padding: 24px 0 48px; }
 }
 .category-view .section-heading { margin-bottom: 24px; }
 .category-view .product-grid { margin-top: 4px; }
-
-
-/* Ao sair de um nicho, mostrar diretamente o seletor de categorias, sem o banner inicial. */
-body.returned-to-categories main > :not(#categorias),
-body.returned-to-categories footer { display: none !important; }
-body.returned-to-categories main { min-height: 100vh; padding: 24px 0 48px; }
-body.returned-to-categories #categorias { display: block !important; padding-top: 24px; }
