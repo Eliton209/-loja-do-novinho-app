@@ -195,6 +195,77 @@ function renderProducts() {
   }
 }
 
+
+function isMercadoLivre(product) {
+  const platform = normalize(product.platform);
+  return platform.includes("mercado livre") || platform.includes("mercadolivre");
+}
+
+function renderCuradoria() {
+  const section = document.querySelector("#curadoria-mercado-livre");
+  const grid = document.querySelector("#curated-grid");
+  if (!section || !grid) return;
+
+  const featured = products.filter(isMercadoLivre);
+  section.hidden = !catalogReady || featured.length === 0;
+  grid.replaceChildren();
+  if (!catalogReady || !featured.length) return;
+
+  for (const product of featured) {
+    const card = document.createElement("article");
+    card.className = "product-card";
+
+    const imageUrl = safeHttpsUrl(product.imageUrl);
+    if (imageUrl) {
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = String(product.title || "Produto do Mercado Livre");
+      image.loading = "lazy";
+      image.decoding = "async";
+      card.append(image);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "product-placeholder";
+      placeholder.textContent = "🛍️";
+      card.append(placeholder);
+    }
+
+    const body = document.createElement("div");
+    body.className = "product-body";
+    const platform = document.createElement("span");
+    platform.className = "platform";
+    platform.textContent = "Mercado Livre";
+    const title = document.createElement("h3");
+    title.textContent = String(product.title || "Produto");
+    body.append(platform, title);
+
+    const price = formatPrice(product.price);
+    if (price) {
+      const priceElement = document.createElement("p");
+      priceElement.className = "price";
+      priceElement.textContent = price;
+      body.append(priceElement);
+    }
+    const description = document.createElement("p");
+    description.className = "desc";
+    description.textContent = String(product.description || "Confira detalhes e disponibilidade na loja parceira.");
+    body.append(description);
+
+    const affiliateUrl = safeHttpsUrl(product.affiliateUrl);
+    if (affiliateUrl) {
+      const link = document.createElement("a");
+      link.className = "buy";
+      link.href = affiliateUrl;
+      link.target = "_blank";
+      link.rel = "sponsored nofollow noopener";
+      link.textContent = "Ver oferta";
+      body.append(link);
+    }
+    card.append(body);
+    grid.append(card);
+  }
+}
+
 function setActiveCategory(category) {
   activeCategory = activeCategory === category ? "" : category;
   categoryList.querySelectorAll("button").forEach(button => {
@@ -246,6 +317,7 @@ import("./catalog.js")
     products = items;
     catalogReady = true;
     renderProducts();
+    renderCuradoria();
   })
   .catch(error => {
     catalogReady = true;
@@ -254,5 +326,6 @@ import("./catalog.js")
     state.className = "catalog-state";
     state.textContent = "Não foi possível carregar o catálogo agora. Tente novamente mais tarde.";
     grid.replaceChildren(state);
+    renderCuradoria();
     console.error("Falha na leitura do catálogo Wix:", error);
   });
