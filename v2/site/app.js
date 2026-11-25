@@ -101,10 +101,12 @@ function formatPrice(value) {
 }
 
 function renderProducts() {
-  const grid = document.querySelector("#product-grid");
+  const grid = document.querySelector(activeCategory ? "#niche-product-grid" : "#product-grid");
   const section = document.querySelector("#vitrine");
-  const count = document.querySelector("#result-count");
-  if (!grid || !section || !count) return;
+  const nicheView = document.querySelector("#niche-view");
+  const categoryHeading = document.querySelector("#categories-heading");
+  const count = document.querySelector(activeCategory ? "#niche-result-count" : "#result-count");
+  if (!grid || !section || !count || !nicheView) return;
 
   const visible = products.filter(product => {
     const inCategory = !activeCategory || categoryMatches(product, activeCategory);
@@ -112,8 +114,19 @@ function renderProducts() {
     return inCategory && inSearch;
   });
 
-  section.hidden = !activeCategory && !activeSearch;
-  productsTitle.textContent = activeCategory || (activeSearch ? "Resultados da busca" : "Vitrine");
+  // Categoria selecionada: os produtos ficam dentro da própria tela do nicho.
+  // Busca sem categoria: os resultados aparecem na seção geral de busca.
+  nicheView.hidden = !activeCategory;
+  categoryList.hidden = Boolean(activeCategory);
+  if (categoryHeading) categoryHeading.hidden = Boolean(activeCategory);
+  section.hidden = Boolean(activeCategory) || !activeSearch;
+
+  if (activeCategory) {
+    document.querySelector("#niche-title").textContent = activeCategory;
+  } else {
+    productsTitle.textContent = activeSearch ? "Resultados da busca" : "Vitrine";
+  }
+
   count.textContent = catalogReady
     ? visible.length + " produto(s)"
     : "Carregando catálogo…";
@@ -202,13 +215,22 @@ function setActiveCategory(category) {
   });
   renderProducts();
   if (activeCategory) {
-    document.querySelector("#vitrine").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector("#categorias").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
+
+document.querySelector("#back-to-categories").addEventListener("click", () => {
+  activeCategory = "";
+  categoryList.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", "false"));
+  renderProducts();
+  document.querySelector("#categorias").scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
 searchForm.addEventListener("submit", event => {
   event.preventDefault();
   activeSearch = searchInput.value.trim();
+  activeCategory = "";
+  categoryList.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", "false"));
   renderProducts();
   if (activeSearch) {
     document.querySelector("#vitrine").scrollIntoView({ behavior: "smooth", block: "start" });
