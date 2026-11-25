@@ -1,5 +1,5 @@
 // Loja do Novinho — V2 isolada.
-// Não consulta nem altera o CMS Wix. A conexão será feita após validar leitura pública segura.
+// Consulta o catálogo Wix apenas por leitura pública; nenhuma operação de escrita é usada.
 const categories = [
   { name: "Eletrônicos", icon: "📱", subtitle: "Celulares e tecnologia" },
   { name: "Casa, móveis e decoração", icon: "🏠", subtitle: "Conforto para seu espaço" },
@@ -25,16 +25,6 @@ let products = [];
 let catalogReady = false;
 let activeSearch = "";
 
-
-function setActiveCategory(category) {
-  activeCategory = activeCategory === category ? "" : category;
-  categoryList.querySelectorAll("button").forEach((button) => {
-    button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
-  });
-  productsTitle.textContent = activeCategory || "Vitrine";
-  document.querySelector("#vitrine").scrollIntoView({ behavior: "smooth", block: "start" });
-  // O filtro será aplicado aos produtos reais quando o catálogo Wix for conectado.
-}
 
 function renderCategories() {
   categoryList.replaceChildren();
