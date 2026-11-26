@@ -24,6 +24,7 @@ let deferredInstallPrompt = null;
 let products = [];
 let catalogReady = false;
 let activeSearch = "";
+let activeSearchResults = null;
 
 
 function renderCategories() {
@@ -158,10 +159,11 @@ function renderProducts() {
 
   // Na busca, exibe todos os produtos encontrados sem um segundo filtro
   // de categoria que poderia ocultar o próprio resultado.
-  const visible = products.filter(product => {
-    if (activeSearch) return productMatchesSearch(product, activeSearch);
-    return !activeCategory || categoryMatches(product, activeCategory);
-  });
+  // A lista encontrada é mantida separada do filtro de nicho. Assim,
+  // abrir o nicho não pode eliminar os produtos que a busca já localizou.
+  const visible = Array.isArray(activeSearchResults)
+    ? activeSearchResults
+    : products.filter(product => !activeCategory || categoryMatches(product, activeCategory));
 
   const categoryView = document.querySelector("#category-view");
   categoryView.hidden = !categoryMode;
@@ -333,6 +335,7 @@ function renderCuradoria() {
 function closeCategoryView() {
   activeCategory = "";
   activeSearch = "";
+  activeSearchResults = null;
   searchInput.value = "";
   categoryList.querySelectorAll("button").forEach(button => {
     button.setAttribute("aria-pressed", "false");
@@ -356,6 +359,7 @@ function setActiveCategory(category) {
   document.body.classList.remove("returned-to-categories");
   activeCategory = category;
   activeSearch = "";
+  activeSearchResults = null;
   searchInput.value = "";
   categoryList.querySelectorAll("button").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
@@ -399,6 +403,7 @@ searchForm.addEventListener("submit", event => {
   }
 
   const matches = products.filter(product => productMatchesSearch(product, activeSearch));
+  activeSearchResults = matches;
   if (!matches.length) {
     // A mensagem aparece logo abaixo do campo, sem rolar ou descer a página.
     categoryList.querySelectorAll("button").forEach(button => {
@@ -443,6 +448,7 @@ searchInput.addEventListener("input", () => {
   feedback.hidden = true;
   if (!searchInput.value.trim()) {
     activeSearch = "";
+    activeSearchResults = null;
     activeCategory = "";
     categoryList.querySelectorAll("button").forEach(button => {
       button.setAttribute("aria-pressed", "false");
