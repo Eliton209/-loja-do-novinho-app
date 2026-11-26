@@ -448,18 +448,15 @@ searchInput.addEventListener("input", () => {
   }
 });
 
-// O botão de instalação aparece apenas no navegador comum.
-const browserDisplayMode = window.matchMedia("(display-mode: browser)");
+// O botão fica oculto somente quando a vitrine já está instalada (standalone).
 const standaloneDisplayMode = window.matchMedia("(display-mode: standalone)");
 
 function syncInstallButtonVisibility() {
   const isStandalone = standaloneDisplayMode.matches || window.navigator.standalone === true;
-  const isBrowser = browserDisplayMode.matches && !isStandalone;
-  installButton.hidden = !isBrowser;
+  installButton.hidden = isStandalone;
 }
 
 syncInstallButtonVisibility();
-browserDisplayMode.addEventListener?.("change", syncInstallButtonVisibility);
 standaloneDisplayMode.addEventListener?.("change", syncInstallButtonVisibility);
 
 window.addEventListener("beforeinstallprompt", (event) => {
