@@ -601,3 +601,9 @@ body.category-open main { min-height: 100vh; padding: 24px 0 48px; }
 }
 .category-view .section-heading { margin-bottom: 24px; }
 .category-view .product-grid { margin-top: 4px; }
+
+
+/* O botão de instalação não deve aparecer dentro do app instalado. */
+@media (display-mode: standalone) {
+  .button-install { display: none !important; }
+}
