@@ -409,19 +409,37 @@ searchForm.addEventListener("submit", event => {
   categoryList.querySelectorAll("button").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
   });
+
+  const feedback = document.querySelector("#search-feedback");
+  const hasProductMatches = activeCategory
+    ? products.some(product => categoryMatches(product, activeCategory) &&
+        (!activeSearch || productMatchesSearch(product, activeSearch)))
+    : false;
+
+  if (activeSearch && !activeCategory && catalogReady) {
+    // Resultado não encontrado: mensagem junto à busca, sem deslocar a página.
+    feedback.textContent = "Não encontramos esse produto. Tente outro nome.";
+    feedback.hidden = false;
+    document.querySelector("#vitrine").hidden = true;
+    document.querySelector("#category-view").hidden = true;
+    return;
+  }
+
+  feedback.hidden = true;
   renderProducts();
 
-  if (activeSearch) {
-    const destination = activeCategory
-      ? document.querySelector("#category-view")
-      : document.querySelector("#vitrine");
-    destination.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (activeSearch && activeCategory && hasProductMatches) {
+    document.querySelector("#category-view").scrollIntoView({ behavior: "smooth", block: "start" });
+  } else if (activeCategory) {
+    document.querySelector("#category-view").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 });
 
 searchInput.addEventListener("input", () => {
   if (!searchInput.value.trim()) {
     activeSearch = "";
+    document.querySelector("#search-feedback").hidden = true;
+    document.querySelector("#vitrine").hidden = false;
     renderProducts();
   }
 });
