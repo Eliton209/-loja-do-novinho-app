@@ -160,9 +160,12 @@ function renderProducts() {
   if (!grid || !section || !count) return;
 
   const visible = products.filter(product => {
-    const inCategory = !activeCategory || categoryMatches(product, activeCategory);
-    const inSearch = !activeSearch || productMatchesSearch(product, activeSearch);
-    return inCategory && inSearch;
+    // Na busca, o nicho serve para orientar a tela, não para eliminar resultados.
+    // O cadastro Wix pode ter variações no campo category; por isso, ao pesquisar,
+    // preservamos todos os produtos encontrados pelo termo, mesmo que a categoria
+    // cadastrada não coincida literalmente com o rótulo visual do nicho.
+    if (activeSearch) return productMatchesSearch(product, activeSearch);
+    return !activeCategory || categoryMatches(product, activeCategory);
   });
 
   const categoryView = document.querySelector("#category-view");
