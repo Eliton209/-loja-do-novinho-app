@@ -171,8 +171,9 @@ function renderProducts() {
   // dentro dos produtos daquele nicho. Se o termo foi o próprio nome do nicho
   // (ex.: "cama"), exibe os produtos do nicho em vez de esconder todos.
   if (activeSearch && activeCategory) {
-    const withinCategory = visible.filter(product => productMatchesSearch(product, activeSearch));
-    visible = withinCategory.length ? withinCategory : visible;
+    // Mantém somente os produtos que realmente correspondem à busca.
+    // Não volta a exibir todo o nicho quando nenhum produto combina.
+    visible = visible.filter(product => productMatchesSearch(product, activeSearch));
   } else if (activeSearch) {
     visible = products.filter(product => productMatchesSearch(product, activeSearch));
   }
@@ -415,9 +416,10 @@ searchForm.addEventListener("submit", event => {
   });
 
   const feedback = document.querySelector("#search-feedback");
+  // A busca só é considerada encontrada quando há produto correspondente.
+  // Reconhecer o nome do nicho serve para filtrar, mas não substitui o produto.
   const hasMatches = activeSearch
-    ? categories.some(category => categoryNameMatchesSearch(category.name, activeSearch)) ||
-      products.some(product => productMatchesSearch(product, activeSearch))
+    ? products.some(product => productMatchesSearch(product, activeSearch))
     : Boolean(activeCategory);
 
   if (activeSearch && catalogReady && !hasMatches) {
