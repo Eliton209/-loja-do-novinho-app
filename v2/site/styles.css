@@ -610,11 +610,11 @@ body.category-open main { min-height: 100vh; padding: 24px 0 48px; }
 
 .button-install[hidden] { display: none !important; }
 
-
-/* Oculta elementos da Vercel Toolbar nesta versão de pré-visualização */
+/* Bloqueio visual da Vercel Toolbar nesta versão de pré-visualização. */
 vercel-live-feedback,
 #vercel-toolbar,
 [data-vercel-toolbar],
+[data-vercel-live-feedback],
 iframe[src*="vercel.live"] {
   display: none !important;
   visibility: hidden !important;
