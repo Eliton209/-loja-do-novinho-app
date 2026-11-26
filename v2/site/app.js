@@ -373,9 +373,16 @@ function setActiveCategory(category) {
   renderProducts();
   // Ao abrir um nicho, reposiciona a tela no topo da página de produtos.
   // Isso evita manter a rolagem antiga da lista de categorias após ocultá-la.
-  requestAnimationFrame(() => {
+  // Espera o layout do nicho estabilizar antes de posicionar a tela.
+  const scrollToCategoryProducts = () => {
     const categoryView = document.querySelector("#category-view");
-    categoryView?.scrollIntoView({ behavior: "instant", block: "start" });
+    if (!categoryView || categoryView.hidden) return;
+    const top = categoryView.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: Math.max(0, top - 12), behavior: "instant" });
+  };
+  requestAnimationFrame(() => {
+    requestAnimationFrame(scrollToCategoryProducts);
+    window.setTimeout(scrollToCategoryProducts, 350);
   });
 }
 
