@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "ldn-vitrine-";
-const CACHE_NAME = `${CACHE_PREFIX}v10`;
+const CACHE_NAME = `${CACHE_PREFIX}v11`;
 const APP_FILES = [
   "/",
   "/index.html",
