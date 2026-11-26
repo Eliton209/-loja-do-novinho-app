@@ -78,17 +78,16 @@ function categoryMatches(product, category) {
 }
 
 function productMatchesSearch(product, term) {
-  // Não inclui a categoria: isso fazia a palavra "cama" combinar com TODOS
-  // os produtos do nicho "Cama, mesa e banho", mesmo sem relação com o item.
+  // O termo pode corresponder ao nome do produto OU à categoria cadastrada.
+  // Assim, buscar "cama" mostra os produtos do nicho Cama, mesa e banho.
   const haystack = normalize([
     product.title,
     product.description,
+    product.category,
     product.platform
   ].join(" "));
   const normalizedTerm = normalize(term);
-  if (!normalizedTerm) return true;
-  const terms = normalizedTerm.split(" ").filter(Boolean);
-  return terms.every(word => haystack.includes(word));
+  return !normalizedTerm || haystack.includes(normalizedTerm);
 }
 
 function safeHttpsUrl(value) {
@@ -379,31 +378,21 @@ searchForm.addEventListener("submit", event => {
   activeCategory = "";
 
   if (activeSearch && catalogReady) {
-    // Primeiro verifica se o termo é o próprio nome de um nicho.
-    // Nesse caso, abre o nicho e mostra TODOS os produtos dele.
-    const directCategory = categories.find(category =>
-      normalize(category.name).includes(normalize(activeSearch)) &&
-      products.some(product => categoryMatches(product, category.name))
-    );
+    // Primeiro encontra produtos pelo nome, descrição, categoria ou plataforma.
+    // Depois abre o nicho com esses resultados, mantendo o termo ativo para filtrar.
+    const matches = products.filter(product => productMatchesSearch(product, activeSearch));
+    const categoryCounts = categories
+      .map(category => ({
+        name: category.name,
+        count: matches.filter(product => categoryMatches(product, category.name)).length
+      }))
+      .filter(item => item.count > 0)
+      .sort((a, b) => b.count - a.count);
 
-    if (directCategory) {
-      activeCategory = directCategory.name;
-      activeSearch = "";
-    } else {
-      // Para termos como "celular", mostra apenas os produtos que combinam
-      // com o nome/descrição dentro do nicho mais relevante.
-      const matches = products.filter(product => productMatchesSearch(product, activeSearch));
-      const categoryCounts = categories
-        .map(category => ({
-          name: category.name,
-          count: matches.filter(product => categoryMatches(product, category.name)).length
-        }))
-        .filter(item => item.count > 0)
-        .sort((a, b) => b.count - a.count);
-      if (categoryCounts.length) activeCategory = categoryCounts[0].name;
+    if (categoryCounts.length) {
+      activeCategory = categoryCounts[0].name;
+      registerCategoryHistory();
     }
-
-    if (activeCategory) registerCategoryHistory();
   }
 
   categoryList.querySelectorAll("button").forEach(button => {
@@ -411,13 +400,12 @@ searchForm.addEventListener("submit", event => {
   });
 
   const feedback = document.querySelector("#search-feedback");
-  const hasProductMatches = activeCategory
-    ? products.some(product => categoryMatches(product, activeCategory) &&
-        (!activeSearch || productMatchesSearch(product, activeSearch)))
-    : false;
+  const hasMatches = activeSearch
+    ? products.some(product => productMatchesSearch(product, activeSearch))
+    : Boolean(activeCategory);
 
-  if (activeSearch && !activeCategory && catalogReady) {
-    // Resultado não encontrado: mensagem junto à busca, sem deslocar a página.
+  if (activeSearch && catalogReady && !hasMatches) {
+    // Sem resultados: mensagem junto à busca, sem deslocar a página.
     feedback.textContent = "Não encontramos esse produto. Tente outro nome.";
     feedback.hidden = false;
     document.querySelector("#vitrine").hidden = true;
@@ -428,9 +416,7 @@ searchForm.addEventListener("submit", event => {
   feedback.hidden = true;
   renderProducts();
 
-  if (activeSearch && activeCategory && hasProductMatches) {
-    document.querySelector("#category-view").scrollIntoView({ behavior: "smooth", block: "start" });
-  } else if (activeCategory) {
+  if (activeCategory) {
     document.querySelector("#category-view").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 });
