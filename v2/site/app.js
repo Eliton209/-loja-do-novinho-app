@@ -448,9 +448,29 @@ searchInput.addEventListener("input", () => {
   }
 });
 
+// O botão de instalação aparece apenas no navegador comum.
+const browserDisplayMode = window.matchMedia("(display-mode: browser)");
+const standaloneDisplayMode = window.matchMedia("(display-mode: standalone)");
+
+function syncInstallButtonVisibility() {
+  const isStandalone = standaloneDisplayMode.matches || window.navigator.standalone === true;
+  const isBrowser = browserDisplayMode.matches && !isStandalone;
+  installButton.hidden = !isBrowser;
+}
+
+syncInstallButtonVisibility();
+browserDisplayMode.addEventListener?.("change", syncInstallButtonVisibility);
+standaloneDisplayMode.addEventListener?.("change", syncInstallButtonVisibility);
+
 window.addEventListener("beforeinstallprompt", (event) => {
   event.preventDefault();
   deferredInstallPrompt = event;
+  syncInstallButtonVisibility();
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  installButton.hidden = true;
 });
 
 installButton.addEventListener("click", async () => {
@@ -458,9 +478,14 @@ installButton.addEventListener("click", async () => {
     resultCount.textContent = "Para instalar, abra o menu do navegador e escolha “Adicionar à tela inicial” ou “Instalar aplicativo”.";
     return;
   }
-  deferredInstallPrompt.prompt();
-  await deferredInstallPrompt.userChoice;
+  const promptEvent = deferredInstallPrompt;
   deferredInstallPrompt = null;
+  try {
+    await promptEvent.prompt();
+    await promptEvent.userChoice;
+  } finally {
+    syncInstallButtonVisibility();
+  }
 });
 
 renderCategories();
@@ -484,3 +509,12 @@ import("./catalog.js")
     renderCuradoria();
     console.error("Falha na leitura do catálogo Wix:", error);
   });
+
+// Registra o service worker na raiz para controlar a vitrine e permitir o modo instalado.
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(error => {
+      console.warn("Não foi possível registrar o service worker:", error);
+    });
+  });
+}
