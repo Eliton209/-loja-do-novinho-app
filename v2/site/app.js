@@ -371,6 +371,11 @@ function setActiveCategory(category) {
     button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
   });
   renderProducts();
+  // Ao abrir um nicho, reposiciona a tela no topo da página de produtos.
+  // Isso evita manter a rolagem antiga da lista de categorias após ocultá-la.
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  });
 }
 
 document.querySelector("#back-to-categories").addEventListener("click", () => {
