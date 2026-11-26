@@ -156,18 +156,24 @@ function renderProducts() {
   const count = document.querySelector(categoryMode ? "#category-result-count" : "#result-count");
   if (!grid || !section || !count) return;
 
+  // Na busca, exibe todos os produtos encontrados sem um segundo filtro
+  // de categoria que poderia ocultar o próprio resultado.
   const visible = products.filter(product => {
-    const inCategory = !activeCategory || categoryMatches(product, activeCategory);
-    const inSearch = !activeSearch || productMatchesSearch(product, activeSearch);
-    return inCategory && inSearch;
+    if (activeSearch) return productMatchesSearch(product, activeSearch);
+    return !activeCategory || categoryMatches(product, activeCategory);
   });
 
   const categoryView = document.querySelector("#category-view");
   categoryView.hidden = !categoryMode;
   document.body.classList.toggle("category-open", categoryMode);
   section.hidden = categoryMode || !activeSearch;
-  if (categoryMode) document.querySelector("#category-products-title").textContent = activeCategory;
-  else productsTitle.textContent = activeSearch ? "Resultados da busca" : "Vitrine";
+  if (categoryMode) {
+    document.querySelector("#category-products-title").textContent = activeSearch
+      ? "Resultados da busca: " + activeSearch
+      : activeCategory;
+  } else {
+    productsTitle.textContent = activeSearch ? "Resultados da busca: " + activeSearch : "Vitrine";
+  }
   count.textContent = catalogReady
     ? visible.length + " produto(s)"
     : "Carregando catálogo…";
@@ -374,38 +380,73 @@ searchForm.addEventListener("submit", event => {
   activeSearch = searchInput.value.trim();
   activeCategory = "";
 
-  if (activeSearch && catalogReady) {
-    // A busca abre somente o nicho correspondente; não cria uma lista duplicada na vitrine.
-    const matches = products.filter(product => productMatchesSearch(product, activeSearch));
-    const categoryCounts = categories
-      .map(category => ({
-        name: category.name,
-        count: matches.filter(product => categoryMatches(product, category.name)).length
-      }))
-      .filter(item => item.count > 0)
-      .sort((a, b) => b.count - a.count);
-    if (categoryCounts.length) {
-      activeCategory = categoryCounts[0].name;
-      registerCategoryHistory();
-    }
+  const feedback = document.querySelector("#search-feedback");
+  feedback.hidden = true;
+  feedback.textContent = "";
+
+  if (!activeSearch) {
+    categoryList.querySelectorAll("button").forEach(button => {
+      button.setAttribute("aria-pressed", "false");
+    });
+    renderProducts();
+    return;
+  }
+
+  if (!catalogReady) {
+    feedback.textContent = "Aguarde: estamos carregando os produtos da loja.";
+    feedback.hidden = false;
+    return;
+  }
+
+  const matches = products.filter(product => productMatchesSearch(product, activeSearch));
+  if (!matches.length) {
+    // A mensagem aparece logo abaixo do campo, sem rolar ou descer a página.
+    categoryList.querySelectorAll("button").forEach(button => {
+      button.setAttribute("aria-pressed", "false");
+    });
+    document.querySelector("#vitrine").hidden = true;
+    document.querySelector("#category-view").hidden = true;
+    document.body.classList.remove("category-open");
+    feedback.textContent = "Não encontramos esse produto. Tente outro nome.";
+    feedback.hidden = false;
+    return;
+  }
+
+  const categoryCounts = categories
+    .map(category => ({
+      name: category.name,
+      count: matches.filter(product => categoryMatches(product, category.name)).length
+    }))
+    .filter(item => item.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  // Se houver um nicho correspondente, abre esse nicho; os cards são
+  // renderizados pelo resultado da busca, sem perder produtos por categoria.
+  if (categoryCounts.length) {
+    activeCategory = categoryCounts[0].name;
+    registerCategoryHistory();
   }
 
   categoryList.querySelectorAll("button").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
   });
-  renderProducts();
 
-  if (activeSearch) {
-    const destination = activeCategory
-      ? document.querySelector("#category-view")
-      : document.querySelector("#vitrine");
-    destination.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  renderProducts();
+  const destination = activeCategory
+    ? document.querySelector("#category-view")
+    : document.querySelector("#vitrine");
+  destination.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 searchInput.addEventListener("input", () => {
+  const feedback = document.querySelector("#search-feedback");
+  feedback.hidden = true;
   if (!searchInput.value.trim()) {
     activeSearch = "";
+    activeCategory = "";
+    categoryList.querySelectorAll("button").forEach(button => {
+      button.setAttribute("aria-pressed", "false");
+    });
     renderProducts();
   }
 });
