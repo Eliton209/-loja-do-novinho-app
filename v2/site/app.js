@@ -78,13 +78,17 @@ function categoryMatches(product, category) {
 }
 
 function productMatchesSearch(product, term) {
+  // Não inclui a categoria: isso fazia a palavra "cama" combinar com TODOS
+  // os produtos do nicho "Cama, mesa e banho", mesmo sem relação com o item.
   const haystack = normalize([
     product.title,
     product.description,
-    product.category,
     product.platform
   ].join(" "));
-  return haystack.includes(normalize(term));
+  const normalizedTerm = normalize(term);
+  if (!normalizedTerm) return true;
+  const terms = normalizedTerm.split(" ").filter(Boolean);
+  return terms.every(word => haystack.includes(word));
 }
 
 function safeHttpsUrl(value) {
@@ -375,7 +379,7 @@ searchForm.addEventListener("submit", event => {
   activeCategory = "";
 
   if (activeSearch && catalogReady) {
-    // A busca abre somente o nicho correspondente; não cria uma lista duplicada na vitrine.
+    // A busca abre o nicho com resultados, filtrando pelo nome/descrição do produto.
     const matches = products.filter(product => productMatchesSearch(product, activeSearch));
     const categoryCounts = categories
       .map(category => ({
