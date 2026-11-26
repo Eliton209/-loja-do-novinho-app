@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://lojadonovinho.com.br/sitemap.xml
