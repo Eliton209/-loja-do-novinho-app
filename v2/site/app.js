@@ -374,7 +374,8 @@ function setActiveCategory(category) {
   // Ao abrir um nicho, reposiciona a tela no topo da página de produtos.
   // Isso evita manter a rolagem antiga da lista de categorias após ocultá-la.
   requestAnimationFrame(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
+    const categoryView = document.querySelector("#category-view");
+    categoryView?.scrollIntoView({ behavior: "instant", block: "start" });
   });
 }
 
