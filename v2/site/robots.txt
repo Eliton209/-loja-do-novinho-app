@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /
+
+# Prévia de desenvolvimento: não indexar.
+# A liberação para indexação será feita somente após aprovação e publicação no domínio oficial.
