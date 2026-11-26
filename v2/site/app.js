@@ -416,7 +416,8 @@ searchForm.addEventListener("submit", event => {
 
   const feedback = document.querySelector("#search-feedback");
   const hasMatches = activeSearch
-    ? products.some(product => productMatchesSearch(product, activeSearch))
+    ? categories.some(category => categoryNameMatchesSearch(category.name, activeSearch)) ||
+      products.some(product => productMatchesSearch(product, activeSearch))
     : Boolean(activeCategory);
 
   if (activeSearch && catalogReady && !hasMatches) {
