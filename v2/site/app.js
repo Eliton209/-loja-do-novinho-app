@@ -379,19 +379,31 @@ searchForm.addEventListener("submit", event => {
   activeCategory = "";
 
   if (activeSearch && catalogReady) {
-    // A busca abre o nicho com resultados, filtrando pelo nome/descrição do produto.
-    const matches = products.filter(product => productMatchesSearch(product, activeSearch));
-    const categoryCounts = categories
-      .map(category => ({
-        name: category.name,
-        count: matches.filter(product => categoryMatches(product, category.name)).length
-      }))
-      .filter(item => item.count > 0)
-      .sort((a, b) => b.count - a.count);
-    if (categoryCounts.length) {
-      activeCategory = categoryCounts[0].name;
-      registerCategoryHistory();
+    // Primeiro verifica se o termo é o próprio nome de um nicho.
+    // Nesse caso, abre o nicho e mostra TODOS os produtos dele.
+    const directCategory = categories.find(category =>
+      normalize(category.name).includes(normalize(activeSearch)) &&
+      products.some(product => categoryMatches(product, category.name))
+    );
+
+    if (directCategory) {
+      activeCategory = directCategory.name;
+      activeSearch = "";
+    } else {
+      // Para termos como "celular", mostra apenas os produtos que combinam
+      // com o nome/descrição dentro do nicho mais relevante.
+      const matches = products.filter(product => productMatchesSearch(product, activeSearch));
+      const categoryCounts = categories
+        .map(category => ({
+          name: category.name,
+          count: matches.filter(product => categoryMatches(product, category.name)).length
+        }))
+        .filter(item => item.count > 0)
+        .sort((a, b) => b.count - a.count);
+      if (categoryCounts.length) activeCategory = categoryCounts[0].name;
     }
+
+    if (activeCategory) registerCategoryHistory();
   }
 
   categoryList.querySelectorAll("button").forEach(button => {
