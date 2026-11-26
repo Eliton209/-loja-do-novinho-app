@@ -607,3 +607,5 @@ body.category-open main { min-height: 100vh; padding: 24px 0 48px; }
 @media (display-mode: standalone) {
   .button-install { display: none !important; }
 }
+
+.button-install[hidden] { display: none !important; }
