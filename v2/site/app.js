@@ -67,27 +67,31 @@ function normalize(value) {
     .trim();
 }
 
+function categoryTokens(value) {
+  return normalize(value).split(" ").filter(token => token && !["e", "de", "da", "do", "das", "dos"].includes(token));
+}
+
 function categoryMatches(product, category) {
-  const productCategory = normalize(product.category);
-  const selectedCategory = normalize(category);
-  if (!productCategory || !selectedCategory) return false;
-  // Aceita o nome do nicho e suas variações de cadastro, sem misturar categorias distintas.
-  return productCategory === selectedCategory ||
-    productCategory.startsWith(selectedCategory + " ") ||
-    selectedCategory.startsWith(productCategory + " ");
+  const productTokens = categoryTokens(product.category);
+  const selectedTokens = categoryTokens(category);
+  if (!productTokens.length || !selectedTokens.length) return false;
+  const overlap = selectedTokens.filter(token => productTokens.includes(token)).length;
+  // Compara os termos relevantes da categoria, tolerando pontuação, acentos,
+  // conectivos e pequenas variações usadas no cadastro do catálogo.
+  return overlap === selectedTokens.length || overlap === productTokens.length ||
+    overlap / Math.min(productTokens.length, selectedTokens.length) >= 0.75;
 }
 
 function productMatchesSearch(product, term) {
-  // O termo pode corresponder ao nome do produto OU à categoria cadastrada.
-  // Assim, buscar "cama" mostra os produtos do nicho Cama, mesa e banho.
-  const haystack = normalize([
-    product.title,
-    product.description,
-    product.category,
-    product.platform
-  ].join(" "));
   const normalizedTerm = normalize(term);
-  return !normalizedTerm || haystack.includes(normalizedTerm);
+  if (!normalizedTerm) return true;
+  const haystack = normalize([product.title, product.description, product.platform].join(" "));
+  return haystack.includes(normalizedTerm);
+}
+
+function categoryNameMatchesSearch(category, term) {
+  const normalizedTerm = normalize(term);
+  return Boolean(normalizedTerm) && normalize(category).includes(normalizedTerm);
 }
 
 function safeHttpsUrl(value) {
@@ -159,14 +163,19 @@ function renderProducts() {
   const count = document.querySelector(categoryMode ? "#category-result-count" : "#result-count");
   if (!grid || !section || !count) return;
 
-  const visible = products.filter(product => {
-    // Na busca, o nicho serve para orientar a tela, não para eliminar resultados.
-    // O cadastro Wix pode ter variações no campo category; por isso, ao pesquisar,
-    // preservamos todos os produtos encontrados pelo termo, mesmo que a categoria
-    // cadastrada não coincida literalmente com o rótulo visual do nicho.
-    if (activeSearch) return productMatchesSearch(product, activeSearch);
-    return !activeCategory || categoryMatches(product, activeCategory);
-  });
+  let visible = products.filter(product =>
+    !activeCategory || categoryMatches(product, activeCategory)
+  );
+
+  // ETAPA 2: depois de identificar e abrir o nicho, procura o termo somente
+  // dentro dos produtos daquele nicho. Se o termo foi o próprio nome do nicho
+  // (ex.: "cama"), exibe os produtos do nicho em vez de esconder todos.
+  if (activeSearch && activeCategory) {
+    const withinCategory = visible.filter(product => productMatchesSearch(product, activeSearch));
+    visible = withinCategory.length ? withinCategory : visible;
+  } else if (activeSearch) {
+    visible = products.filter(product => productMatchesSearch(product, activeSearch));
+  }
 
   const categoryView = document.querySelector("#category-view");
   categoryView.hidden = !categoryMode;
@@ -381,21 +390,24 @@ searchForm.addEventListener("submit", event => {
   activeCategory = "";
 
   if (activeSearch && catalogReady) {
-    // Primeiro encontra produtos pelo nome, descrição, categoria ou plataforma.
-    // Depois abre o nicho com esses resultados, mantendo o termo ativo para filtrar.
-    const matches = products.filter(product => productMatchesSearch(product, activeSearch));
+    // ETAPA 1: identifica o nicho a partir do próprio termo pesquisado ou
+    // da categoria dos produtos cujo nome/descrição corresponde à pesquisa.
+    const directCategory = categories.find(category => categoryNameMatchesSearch(category.name, activeSearch));
+    const productMatches = products.filter(product => productMatchesSearch(product, activeSearch));
     const categoryCounts = categories
       .map(category => ({
         name: category.name,
-        count: matches.filter(product => categoryMatches(product, category.name)).length
+        count: productMatches.filter(product => categoryMatches(product, category.name)).length
       }))
       .filter(item => item.count > 0)
       .sort((a, b) => b.count - a.count);
 
-    if (categoryCounts.length) {
+    if (directCategory) {
+      activeCategory = directCategory.name;
+    } else if (categoryCounts.length) {
       activeCategory = categoryCounts[0].name;
-      registerCategoryHistory();
     }
+    if (activeCategory) registerCategoryHistory();
   }
 
   categoryList.querySelectorAll("button").forEach(button => {
