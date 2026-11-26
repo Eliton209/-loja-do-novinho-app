@@ -621,3 +621,93 @@ iframe[src*="vercel.live"] {
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+
+/* Convite para o grupo oficial do WhatsApp — inserido acima do rodapé existente. */
+.whatsapp-community {
+  width: min(900px, calc(100% - 40px));
+  margin: 58px auto 64px;
+  padding: 34px 28px 46px;
+  text-align: center;
+  background: #fff;
+  border-radius: 26px;
+}
+.whatsapp-community-icon {
+  width: 148px;
+  height: 148px;
+  margin: 0 auto 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--navy);
+}
+.whatsapp-community-icon svg { width: 64px; height: 64px; }
+.whatsapp-community h2 {
+  max-width: 680px;
+  margin: 0 auto;
+  color: var(--navy);
+  font-size: clamp(30px, 5.2vw, 54px);
+  line-height: 1.18;
+  font-weight: 800;
+}
+.whatsapp-community h2 span { display: block; color: #d2a51f; }
+.whatsapp-community-copy {
+  max-width: 700px;
+  margin: 48px auto 54px;
+  color: #dce2eb;
+  font-size: clamp(17px, 2.7vw, 26px);
+  line-height: 1.65;
+}
+.whatsapp-community-button {
+  width: min(100%, 580px);
+  min-height: 82px;
+  margin: 0 auto 62px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border-radius: 999px;
+  color: #172b48;
+  background: #d9ad18;
+  box-shadow: 0 10px 22px #9d782b22;
+  font-size: clamp(17px, 2.7vw, 25px);
+  font-weight: 800;
+  text-align: center;
+}
+.whatsapp-community-button span { color: #168b50; font-size: 30px; }
+.whatsapp-community-benefits {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 0;
+  display: grid;
+  gap: 22px;
+  list-style: none;
+  text-align: left;
+}
+.whatsapp-community-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: #555d68;
+  font-size: clamp(17px, 2.5vw, 24px);
+  font-weight: 700;
+}
+.whatsapp-community-benefits li span {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--navy);
+  font-size: 27px;
+}
+@media (max-width: 520px) {
+  .whatsapp-community { width: calc(100% - 30px); margin: 42px auto 48px; padding: 30px 18px 38px; }
+  .whatsapp-community-icon { width: 132px; height: 132px; margin-bottom: 38px; }
+  .whatsapp-community-copy { margin: 42px auto 48px; }
+  .whatsapp-community-button { min-height: 76px; margin-bottom: 52px; }
+}
