@@ -793,3 +793,30 @@ iframe[src*="vercel.live"] {
   .quick-filter-modal { padding:10px; }
   .category-quick-actions { justify-content:center; }
 }
+
+/* Campo de pesquisa compacto do filtro de celulares */
+.quick-filter-search-label {
+  display:block;
+  margin:0 0 7px;
+  color:#14365f;
+  font-size:13px;
+  font-weight:800;
+}
+.quick-filter-search {
+  display:block;
+  width:100%;
+  min-height:46px;
+  margin:0 0 18px;
+  padding:0 15px;
+  border:1px solid #d8c28a;
+  border-radius:12px;
+  outline:none;
+  color:#17385f;
+  background:#fffdf8;
+  font:inherit;
+  font-size:15px;
+}
+.quick-filter-search:focus {
+  border-color:#173f70;
+  box-shadow:0 0 0 3px #d8e5f5;
+}
