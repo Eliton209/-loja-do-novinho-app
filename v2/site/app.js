@@ -181,13 +181,11 @@ function renderProducts() {
   const count = document.querySelector(quickMode ? "#quick-phones-count" : (categoryMode ? "#category-result-count" : "#result-count"));
   if (!grid || !section || !count) return;
 
-  let visible = products.filter(product =>
-    !activeCategory || categoryMatches(product, activeCategory)
-  );
-
-  if (activeQuickFilter === "phones-under-900") {
-    visible = visible.filter(isPhoneUnder900);
-  }
+  // O filtro rápido consulta todos os produtos publicados, sem depender
+  // do texto usado no campo de categoria do cadastro Wix.
+  let visible = quickMode
+    ? products.filter(isPhoneUnder900)
+    : products.filter(product => !activeCategory || categoryMatches(product, activeCategory));
 
   // ETAPA 2: depois de identificar e abrir o nicho, procura o termo somente
   // dentro dos produtos daquele nicho. Se o termo foi o próprio nome do nicho
