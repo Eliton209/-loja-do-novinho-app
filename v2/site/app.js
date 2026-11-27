@@ -409,6 +409,12 @@ function setActiveCategory(category) {
   document.body.classList.remove("returned-to-categories");
   activeCategory = category;
   activeSearch = "";
+  activeQuickFilter = "";
+  const quickButton = document.querySelector("#quick-phones-filter");
+  if (quickButton) {
+    quickButton.setAttribute("aria-pressed", "false");
+    quickButton.innerHTML = '<span aria-hidden="true">📱</span> Celulares até R$ 900';
+  }
   searchInput.value = "";
   categoryList.querySelectorAll("button").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.category === activeCategory));
