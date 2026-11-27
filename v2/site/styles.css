@@ -714,7 +714,7 @@ iframe[src*="vercel.live"] {
 }
 
 
-/* Ajuste visual pontual do cabeçalho e banner da V2 SEO publicada. */
+/* Cabeçalho minimalista da Loja do Novinho + banner integral responsivo. */
 .brand-heading {
   width: min(100%, 1160px);
   margin: 0 auto;
@@ -732,13 +732,18 @@ iframe[src*="vercel.live"] {
   border-bottom: 2px solid #e8b34b;
 }
 .brand-heading .brand-highlight { color: #efb84e; }
+
 .hero-banner {
+  width: 100%;
   min-height: 0;
-  height: clamp(260px, 34vw, 430px);
-  background-size: contain;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  background-size: 100% 100%;
   background-position: center center;
+  background-repeat: no-repeat;
   background-color: #0b2854;
 }
+
 @media (max-width: 1160px) {
   .brand-heading { width: calc(100% - 40px); }
 }
@@ -750,8 +755,6 @@ iframe[src*="vercel.live"] {
     font-size: clamp(20px, 5.5vw, 25px);
   }
   .hero-banner {
-    height: clamp(220px, 62vw, 310px);
-    background-size: contain;
-    background-position: center center;
+    aspect-ratio: 3 / 2;
   }
 }
