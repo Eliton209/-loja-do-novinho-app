@@ -60,11 +60,6 @@
         <button type="submit">Buscar</button>
       </form>
       <p class="search-feedback" id="search-feedback" role="status" aria-live="polite" hidden></p>
-      <div class="quick-filters" aria-label="Filtros rápidos">
-        <button class="quick-filter-button" id="quick-phones-filter" type="button" aria-pressed="false">
-          <span aria-hidden="true">📱</span> Celulares até R$ 900
-        </button>
-      </div>
       <div class="section-divider" aria-hidden="true"></div>
     </section>
 
@@ -159,6 +154,24 @@
       <div class="section-heading products-heading">
         <h2 id="category-products-title">Produtos do nicho</h2>
         <span class="result-count" id="category-result-count" aria-live="polite"></span>
+      </div>
+      <div class="category-quick-actions" id="category-quick-actions" hidden>
+        <button class="quick-filter-button" id="quick-phones-filter" type="button" aria-haspopup="dialog" aria-expanded="false">
+          <span aria-hidden="true">📱</span> Celulares até R$ 900
+        </button>
+      </div>
+      <div class="quick-filter-modal" id="quick-phones-modal" hidden>
+        <div class="quick-filter-backdrop" data-close-quick-filter></div>
+        <section class="quick-filter-dialog" role="dialog" aria-modal="true" aria-labelledby="quick-phones-title">
+          <div class="quick-filter-dialog-heading">
+            <div>
+              <h3 id="quick-phones-title">Celulares até R$ 900</h3>
+              <span id="quick-phones-count" class="result-count" aria-live="polite"></span>
+            </div>
+            <button type="button" class="quick-filter-close" id="close-quick-phones" aria-label="Fechar">×</button>
+          </div>
+          <div class="product-grid quick-filter-results" id="quick-phones-grid"></div>
+        </section>
       </div>
       <div class="product-controls" id="category-product-controls" aria-label="Navegação dos produtos deste nicho">
         <button type="button" class="product-advance" data-direction="previous" aria-label="Voltar um produto">‹</button>
