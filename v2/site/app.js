@@ -15,8 +15,6 @@ const categories = [
 const categoryList = document.querySelector("#category-list");
 const searchForm = document.querySelector("#search-form");
 const searchInput = document.querySelector("#search-input");
-const quickPhonesButton = document.querySelector("#quick-phones-filter");
-if (quickPhonesButton) quickPhonesButton.addEventListener("click", () => setQuickFilter("phones-under-900"));
 const productsTitle = document.querySelector("#products-title");
 const resultCount = document.querySelector("#result-count");
 const installButton = document.querySelector("#install-app");
@@ -181,23 +179,16 @@ function setQuickFilter(filter) {
   activeSearch = "";
   searchInput.value = "";
   categoryList.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", "false"));
-  const quickButton = document.querySelector("#quick-phones-filter");
-  if (quickButton) {
-    quickButton.setAttribute("aria-pressed", String(Boolean(activeQuickFilter)));
-    quickButton.innerHTML = activeQuickFilter
-      ? '<span aria-hidden="true">✓</span> Celulares até R$ 900 · Limpar'
-      : '<span aria-hidden="true">📱</span> Celulares até R$ 900';
-  }
   renderProducts();
-  const target = document.querySelector("#vitrine");
-  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+
 }
 
 function renderProducts() {
   const categoryMode = Boolean(activeCategory);
-  const grid = document.querySelector(categoryMode ? "#category-product-grid" : "#product-grid");
+  const quickMode = activeQuickFilter === "phones-under-900";
+  const grid = document.querySelector(quickMode ? "#quick-phones-grid" : (categoryMode ? "#category-product-grid" : "#product-grid"));
   const section = document.querySelector("#vitrine");
-  const count = document.querySelector(categoryMode ? "#category-result-count" : "#result-count");
+  const count = document.querySelector(quickMode ? "#quick-phones-count" : (categoryMode ? "#category-result-count" : "#result-count"));
   if (!grid || !section || !count) return;
 
   let visible = products.filter(product =>
@@ -205,7 +196,7 @@ function renderProducts() {
   );
 
   if (activeQuickFilter === "phones-under-900") {
-    visible = products.filter(isPhoneUnder900);
+    visible = visible.filter(isPhoneUnder900);
   }
 
   // ETAPA 2: depois de identificar e abrir o nicho, procura o termo somente
@@ -221,10 +212,16 @@ function renderProducts() {
 
   const categoryView = document.querySelector("#category-view");
   categoryView.hidden = !categoryMode;
+  const quickModal = document.querySelector("#quick-phones-modal");
+  const quickButton = document.querySelector("#quick-phones-filter");
+  const quickActions = document.querySelector("#category-quick-actions");
+  if (quickModal) quickModal.hidden = !quickMode;
+  if (quickButton) quickButton.setAttribute("aria-expanded", String(quickMode));
+  if (quickActions) quickActions.hidden = activeCategory !== "Eletrônicos";
   document.body.classList.toggle("category-open", categoryMode);
-  section.hidden = categoryMode || (!activeSearch && !activeQuickFilter);
+  section.hidden = categoryMode || !activeSearch;
   if (categoryMode) document.querySelector("#category-products-title").textContent = activeCategory;
-  else productsTitle.textContent = activeQuickFilter ? "Celulares até R$ 900" : (activeSearch ? "Resultados da busca" : "Vitrine");
+  else productsTitle.textContent = activeSearch ? "Resultados da busca" : "Vitrine";
   count.textContent = catalogReady
     ? visible.length + " produto(s)"
     : "Carregando catálogo…";
@@ -386,6 +383,7 @@ function renderCuradoria() {
 function closeCategoryView() {
   activeCategory = "";
   activeSearch = "";
+  activeQuickFilter = "";
   searchInput.value = "";
   categoryList.querySelectorAll("button").forEach(button => {
     button.setAttribute("aria-pressed", "false");
@@ -434,6 +432,29 @@ function setActiveCategory(category) {
     window.setTimeout(scrollToCategoryProducts, 350);
   });
 }
+
+document.querySelector("#quick-phones-filter").addEventListener("click", () => {
+  activeQuickFilter = "phones-under-900";
+  activeSearch = "";
+  searchInput.value = "";
+  renderProducts();
+});
+document.querySelector("#close-quick-phones").addEventListener("click", () => {
+  activeQuickFilter = "";
+  renderProducts();
+});
+document.querySelector("#quick-phones-modal").addEventListener("click", event => {
+  if (event.target.matches("[data-close-quick-filter]")) {
+    activeQuickFilter = "";
+    renderProducts();
+  }
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && activeQuickFilter) {
+    activeQuickFilter = "";
+    renderProducts();
+  }
+});
 
 document.querySelector("#back-to-categories").addEventListener("click", () => {
   if (history.state?.ldnCategoryOpen) {
