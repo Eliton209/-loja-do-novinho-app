@@ -173,16 +173,6 @@ function isPhoneUnder900(product) {
   return phone && !accessory && Number.isFinite(price) && price <= 900;
 }
 
-function setQuickFilter(filter) {
-  activeQuickFilter = activeQuickFilter === filter ? "" : filter;
-  activeCategory = "";
-  activeSearch = "";
-  searchInput.value = "";
-  categoryList.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", "false"));
-  renderProducts();
-
-}
-
 function renderProducts() {
   const categoryMode = Boolean(activeCategory);
   const quickMode = activeQuickFilter === "phones-under-900";
