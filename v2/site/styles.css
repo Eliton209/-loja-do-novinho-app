@@ -712,3 +712,46 @@ iframe[src*="vercel.live"] {
   .whatsapp-community-copy { margin: 42px auto 48px; }
   .whatsapp-community-button { min-height: 76px; margin-bottom: 52px; }
 }
+
+
+/* Ajuste visual pontual do cabeçalho e banner da V2 SEO publicada. */
+.brand-heading {
+  width: min(100%, 1160px);
+  margin: 0 auto;
+  padding: 20px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  color: #fff;
+  font-size: clamp(23px, 3vw, 32px);
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: .055em;
+  text-align: left;
+  border-bottom: 2px solid #e8b34b;
+}
+.brand-heading .brand-highlight { color: #efb84e; }
+.hero-banner {
+  min-height: 0;
+  height: clamp(260px, 34vw, 430px);
+  background-size: contain;
+  background-position: center center;
+  background-color: #0b2854;
+}
+@media (max-width: 1160px) {
+  .brand-heading { width: calc(100% - 40px); }
+}
+@media (max-width: 520px) {
+  .brand-heading {
+    width: calc(100% - 30px);
+    padding: 16px 0 13px;
+    gap: 6px;
+    font-size: clamp(20px, 5.5vw, 25px);
+  }
+  .hero-banner {
+    height: clamp(220px, 62vw, 310px);
+    background-size: contain;
+    background-position: center center;
+  }
+}
