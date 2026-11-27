@@ -430,7 +430,10 @@ function renderCuradoria() {
     title.textContent = String(product.title || "Produto");
     body.append(platform, title);
 
-    const price = formatPrice(product.price);
+    const numericPrice = getProductPrice(product);
+    const price = Number.isFinite(numericPrice)
+      ? numericPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+      : formatPrice(product.price);
     if (price) {
       const priceElement = document.createElement("p");
       priceElement.className = "price";
