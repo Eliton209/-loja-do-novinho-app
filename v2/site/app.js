@@ -285,7 +285,10 @@ function renderProducts() {
 
     body.append(platform, title);
 
-    const price = formatPrice(product.price);
+    const numericPrice = getProductPrice(product);
+    const price = Number.isFinite(numericPrice)
+      ? numericPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+      : formatPrice(product.price);
     if (price) {
       const priceElement = document.createElement("p");
       priceElement.className = "price";
@@ -317,9 +320,27 @@ function renderProducts() {
 }
 
 
-function isMercadoLivre(product) {
-  const platform = normalize(product.platform);
-  return platform.includes("mercado livre") || platform.includes("mercadolivre");
+function getCheapestProductsPerCategory(items, limit = 6) {
+  const groups = new Map();
+  for (const product of items) {
+    const category = String(product.category || "").trim();
+    const price = getProductPrice(product);
+    if (!category || !Number.isFinite(price)) continue;
+    const key = normalize(category);
+    if (!key) continue;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ product, price });
+  }
+
+  const selected = [];
+  for (const group of groups.values()) {
+    group.sort((a, b) => a.price - b.price);
+    // Até seis por categoria: se houver menos, todos os produtos com preço válido entram.
+    selected.push(...group.slice(0, limit));
+  }
+  return selected
+    .sort((a, b) => a.price - b.price)
+    .map(item => item.product);
 }
 
 function renderCuradoria() {
@@ -327,7 +348,7 @@ function renderCuradoria() {
   const grid = document.querySelector("#curated-grid");
   if (!section || !grid) return;
 
-  const featured = products.filter(isMercadoLivre);
+  const featured = getCheapestProductsPerCategory(products, 6);
   section.hidden = !catalogReady || featured.length === 0;
   grid.replaceChildren();
   if (!catalogReady || !featured.length) return;
@@ -355,7 +376,7 @@ function renderCuradoria() {
     body.className = "product-body";
     const platform = document.createElement("span");
     platform.className = "platform";
-    platform.textContent = "Mercado Livre";
+    platform.textContent = String(product.platform || "Loja parceira");
     const title = document.createElement("h3");
     title.textContent = String(product.title || "Produto");
     body.append(platform, title);
