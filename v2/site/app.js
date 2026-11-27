@@ -63,7 +63,6 @@ trackStoreEvent("store_open");
 document.addEventListener("click", event => {
   const productCard = event.target.closest(".product-card-clickable");
   const link = event.target.closest("a");
-  const destinationUrl = link?.href || (productCard ? productCard.getAttribute("aria-label") : "");
   if (link?.href) {
     let destination;
     try { destination = new URL(link.href); } catch { return; }
