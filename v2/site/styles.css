@@ -758,3 +758,38 @@ iframe[src*="vercel.live"] {
     aspect-ratio: 3 / 2;
   }
 }
+
+
+/* Filtro rápido de celulares na área de busca */
+.quick-filters {
+  display: flex;
+  justify-content: center;
+  width: min(90%, 1120px);
+  margin: 13px auto 0;
+}
+.quick-filter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 43px;
+  padding: 0 18px;
+  border: 1px solid #d9b65f;
+  border-radius: 999px;
+  color: #14365f;
+  background: linear-gradient(180deg, #fffdf7, #fff4d8);
+  box-shadow: 0 4px 12px #102e5312;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.quick-filter-button span { font-size: 18px; }
+.quick-filter-button:hover { transform: translateY(-1px); box-shadow: 0 7px 16px #102e5320; }
+.quick-filter-button[aria-pressed="true"] {
+  color: #fff;
+  border-color: #14365f;
+  background: #14365f;
+}
+.quick-filter-button:focus-visible { outline: 3px solid #e4bd60; outline-offset: 3px; }
