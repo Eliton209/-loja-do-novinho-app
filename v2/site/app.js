@@ -26,6 +26,52 @@ let catalogReady = false;
 let activeSearch = "";
 let activeQuickFilter = "";
 
+const METRICS_ENDPOINT = "https://cwnkpbwnexzulutpnnoq.supabase.co/functions/v1/store-event-tracking-v2";
+const METRICS_SOURCE = "storefront_v2";
+const DEVICE_TOKEN_KEY = "ldn_metrics_device_v1";
+
+function getMetricsDeviceToken() {
+  try {
+    let token = localStorage.getItem(DEVICE_TOKEN_KEY);
+    if (!token) {
+      token = crypto.randomUUID();
+      localStorage.setItem(DEVICE_TOKEN_KEY, token);
+    }
+    return token;
+  } catch {
+    return "";
+  }
+}
+
+function trackStoreEvent(eventType) {
+  const deviceToken = getMetricsDeviceToken();
+  if (!deviceToken) return;
+  fetch(METRICS_ENDPOINT, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      event_type: eventType,
+      source: METRICS_SOURCE,
+      device_token: deviceToken,
+      path: location.pathname + location.hash
+    }),
+    keepalive: true
+  }).catch(() => {});
+}
+
+trackStoreEvent("store_open");
+document.addEventListener("click", event => {
+  const link = event.target.closest("a");
+  if (!link || !link.href) return;
+  let destination;
+  try { destination = new URL(link.href); } catch { return; }
+  if (destination.origin === location.origin) return;
+  if (destination.hostname === "chat.whatsapp.com" || destination.hostname.endsWith("whatsapp.com")) return;
+  if (link.rel.includes("sponsored") || link.classList.contains("buy")) {
+    trackStoreEvent("enter_store_click");
+  }
+});
+
 
 function renderCategories() {
   categoryList.replaceChildren();
@@ -585,6 +631,7 @@ window.addEventListener("beforeinstallprompt", (event) => {
 window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
   installButton.hidden = true;
+  trackStoreEvent("install_confirmed");
 });
 
 installButton.addEventListener("click", async () => {
