@@ -15,6 +15,8 @@ const categories = [
 const categoryList = document.querySelector("#category-list");
 const searchForm = document.querySelector("#search-form");
 const searchInput = document.querySelector("#search-input");
+const quickPhonesButton = document.querySelector("#quick-phones-filter");
+if (quickPhonesButton) quickPhonesButton.addEventListener("click", () => setQuickFilter("phones-under-900"));
 const productsTitle = document.querySelector("#products-title");
 const resultCount = document.querySelector("#result-count");
 const installButton = document.querySelector("#install-app");
@@ -24,6 +26,7 @@ let deferredInstallPrompt = null;
 let products = [];
 let catalogReady = false;
 let activeSearch = "";
+let activeQuickFilter = "";
 
 
 function renderCategories() {
@@ -156,6 +159,40 @@ function activateProductMarquee(grid, controlsId) {
   setupProductAdvance(grid, controlsId, grid.querySelectorAll(".product-card").length);
 }
 
+function parseProductPrice(value) {
+  if (value === undefined || value === null || String(value).trim() === "") return NaN;
+  const raw = String(value).trim().replace(/[^\d,.-]/g, "");
+  const normalized = raw.includes(",") ? raw.replace(/\./g, "").replace(",", ".") : raw;
+  const price = Number(normalized);
+  return Number.isFinite(price) && price > 0 ? price : NaN;
+}
+
+function isPhoneUnder900(product) {
+  const title = normalize(product.title);
+  const phone = /(smartphone|celular|telefone|moto g\d|galaxy [a-z]?\d|iphone)/.test(title);
+  const accessory = /(capa|pelicula|suporte|carregador|fone|acessorio|bateria|display|tela)/.test(title);
+  const price = parseProductPrice(product.price);
+  return phone && !accessory && Number.isFinite(price) && price <= 900;
+}
+
+function setQuickFilter(filter) {
+  activeQuickFilter = activeQuickFilter === filter ? "" : filter;
+  activeCategory = "";
+  activeSearch = "";
+  searchInput.value = "";
+  categoryList.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", "false"));
+  const quickButton = document.querySelector("#quick-phones-filter");
+  if (quickButton) {
+    quickButton.setAttribute("aria-pressed", String(Boolean(activeQuickFilter)));
+    quickButton.innerHTML = activeQuickFilter
+      ? '<span aria-hidden="true">✓</span> Celulares até R$ 900 · Limpar'
+      : '<span aria-hidden="true">📱</span> Celulares até R$ 900';
+  }
+  renderProducts();
+  const target = document.querySelector("#vitrine");
+  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function renderProducts() {
   const categoryMode = Boolean(activeCategory);
   const grid = document.querySelector(categoryMode ? "#category-product-grid" : "#product-grid");
@@ -166,6 +203,10 @@ function renderProducts() {
   let visible = products.filter(product =>
     !activeCategory || categoryMatches(product, activeCategory)
   );
+
+  if (activeQuickFilter === "phones-under-900") {
+    visible = products.filter(isPhoneUnder900);
+  }
 
   // ETAPA 2: depois de identificar e abrir o nicho, procura o termo somente
   // dentro dos produtos daquele nicho. Se o termo foi o próprio nome do nicho
@@ -181,9 +222,9 @@ function renderProducts() {
   const categoryView = document.querySelector("#category-view");
   categoryView.hidden = !categoryMode;
   document.body.classList.toggle("category-open", categoryMode);
-  section.hidden = categoryMode || !activeSearch;
+  section.hidden = categoryMode || (!activeSearch && !activeQuickFilter);
   if (categoryMode) document.querySelector("#category-products-title").textContent = activeCategory;
-  else productsTitle.textContent = activeSearch ? "Resultados da busca" : "Vitrine";
+  else productsTitle.textContent = activeQuickFilter ? "Celulares até R$ 900" : (activeSearch ? "Resultados da busca" : "Vitrine");
   count.textContent = catalogReady
     ? visible.length + " produto(s)"
     : "Carregando catálogo…";
@@ -200,7 +241,9 @@ function renderProducts() {
   if (!visible.length) {
     const empty = document.createElement("div");
     empty.className = "catalog-state";
-    empty.textContent = "Nenhum produto encontrado nesta categoria ou busca.";
+    empty.textContent = activeQuickFilter
+      ? "No momento, não encontramos celulares publicados por até R$ 900. Confira novamente em breve."
+      : "Nenhum produto encontrado nesta categoria ou busca.";
     grid.append(empty);
     return;
   }
@@ -399,6 +442,12 @@ window.addEventListener("popstate", () => {
 });
 
 searchForm.addEventListener("submit", event => {
+  activeQuickFilter = "";
+  const quickButton = document.querySelector("#quick-phones-filter");
+  if (quickButton) {
+    quickButton.setAttribute("aria-pressed", "false");
+    quickButton.innerHTML = '<span aria-hidden="true">📱</span> Celulares até R$ 900';
+  }
   event.preventDefault();
   activeSearch = searchInput.value.trim();
   activeCategory = "";
