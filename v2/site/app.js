@@ -188,7 +188,7 @@ function isPhoneUnder900(product) {
   const category = normalize(product.category);
   const belongsToElectronics = category.includes("eletronicos");
   const phone = /\b(smartphone|celular|telefone|moto g\d|galaxy [a-z]?\d|iphone)\b/.test(title);
-  const accessory = /(power bank|capa|pelicula|suporte|carregador|fone|acessorio|bateria|display|tela)/.test(title);
+  const accessory = /(?:^| )(power bank|capa|pelicula|suporte|carregador|fone|acessorio|bateria externa|display avulso|tela avulsa)(?: |$)/.test(title);
   const price = getProductPrice(product);
   const matchesSearch = !activeQuickSearch || title.includes(normalize(activeQuickSearch));
   return belongsToElectronics && phone && !accessory && Number.isFinite(price) && price <= 900 && matchesSearch;
