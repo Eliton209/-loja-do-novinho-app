@@ -61,13 +61,16 @@ function trackStoreEvent(eventType) {
 
 trackStoreEvent("store_open");
 document.addEventListener("click", event => {
+  const productCard = event.target.closest(".product-card-clickable");
   const link = event.target.closest("a");
-  if (!link || !link.href) return;
-  let destination;
-  try { destination = new URL(link.href); } catch { return; }
-  if (destination.origin === location.origin) return;
-  if (destination.hostname === "chat.whatsapp.com" || destination.hostname.endsWith("whatsapp.com")) return;
-  if (link.rel.includes("sponsored") || link.classList.contains("buy")) {
+  const destinationUrl = link?.href || (productCard ? productCard.getAttribute("aria-label") : "");
+  if (link?.href) {
+    let destination;
+    try { destination = new URL(link.href); } catch { return; }
+    if (destination.origin === location.origin) return;
+    if (destination.hostname === "chat.whatsapp.com" || destination.hostname.endsWith("whatsapp.com")) return;
+  }
+  if (productCard || (link && (link.rel.includes("sponsored") || link.classList.contains("buy") || link.classList.contains("platform-niche")))) {
     trackStoreEvent("enter_store_click");
   }
 });
