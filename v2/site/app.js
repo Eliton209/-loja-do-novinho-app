@@ -25,7 +25,6 @@ let products = [];
 let catalogReady = false;
 let activeSearch = "";
 let activeQuickFilter = "";
-let activeQuickSearch = "";
 
 
 function renderCategories() {
@@ -190,8 +189,7 @@ function isPhoneUnder900(product) {
   const phone = /\b(smartphone|celular|telefone|moto g\d|galaxy [a-z]?\d|iphone)\b/.test(title);
   const accessory = /(?:^| )(power bank|capa|pelicula|suporte|carregador|fone|acessorio|bateria externa|display avulso|tela avulsa)(?: |$)/.test(title);
   const price = getProductPrice(product);
-  const matchesSearch = !activeQuickSearch || title.includes(normalize(activeQuickSearch));
-  return belongsToElectronics && phone && !accessory && Number.isFinite(price) && price <= 900 && matchesSearch;
+  return belongsToElectronics && phone && !accessory && Number.isFinite(price) && price <= 900;
 }
 
 function renderProducts() {
@@ -438,9 +436,6 @@ function setActiveCategory(category) {
   activeCategory = category;
   activeSearch = "";
   activeQuickFilter = "";
-  activeQuickSearch = "";
-  const quickSearch = document.querySelector("#quick-phones-search");
-  if (quickSearch) quickSearch.value = "";
   const quickButton = document.querySelector("#quick-phones-filter");
   if (quickButton) {
     quickButton.setAttribute("aria-pressed", "false");
@@ -468,34 +463,24 @@ function setActiveCategory(category) {
 
 document.querySelector("#quick-phones-filter").addEventListener("click", () => {
   activeQuickFilter = "phones-under-900";
-  activeQuickSearch = "";
-  const quickSearch = document.querySelector("#quick-phones-search");
-  if (quickSearch) quickSearch.value = "";
   activeSearch = "";
   searchInput.value = "";
   renderProducts();
 });
-document.querySelector("#quick-phones-search").addEventListener("input", event => {
-  activeQuickSearch = event.target.value.trim();
-  renderProducts();
-});
 document.querySelector("#close-quick-phones").addEventListener("click", () => {
   activeQuickFilter = "";
-  activeQuickSearch = "";
   renderProducts();
 });
 document.querySelector("#quick-phones-modal").addEventListener("click", event => {
   if (event.target.matches("[data-close-quick-filter]")) {
     activeQuickFilter = "";
-    activeQuickSearch = "";
-    renderProducts();
+      renderProducts();
   }
 });
 document.addEventListener("keydown", event => {
   if (event.key === "Escape" && activeQuickFilter) {
     activeQuickFilter = "";
-    activeQuickSearch = "";
-    renderProducts();
+      renderProducts();
   }
 });
 
@@ -513,7 +498,6 @@ window.addEventListener("popstate", () => {
 
 searchForm.addEventListener("submit", event => {
   activeQuickFilter = "";
-  activeQuickSearch = "";
   const quickButton = document.querySelector("#quick-phones-filter");
   if (quickButton) {
     quickButton.setAttribute("aria-pressed", "false");
